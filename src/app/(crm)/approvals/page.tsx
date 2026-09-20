@@ -1,7 +1,10 @@
+import { getPendingApprovals } from '@/data/demo'
 import { PageHeader } from '@/components/layout/page-header'
-import { Card, CardContent } from '@/components/ui/card'
+import { ApprovalQueue } from '@/components/approvals/approval-queue'
 
 export default function ApprovalsPage () {
+  const pendingApprovals = getPendingApprovals()
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -9,12 +12,7 @@ export default function ApprovalsPage () {
         description="Finance, land, and builder approvals pending review."
       />
 
-      <Card>
-        <CardContent className="py-8 text-center text-sm text-text-secondary">
-          Approval workflows will be built on top of the Williams Family Home
-          demo deal.
-        </CardContent>
-      </Card>
+      <ApprovalQueue approvals={pendingApprovals} />
     </div>
   )
 }

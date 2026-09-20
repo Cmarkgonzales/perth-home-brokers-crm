@@ -26,7 +26,7 @@ export const NAV_ITEMS: {
   { href: '/leads', label: 'Leads', icon: UserPlus },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/deals', label: 'Deals', icon: Handshake },
-  { href: '/packages', label: 'Packages', icon: Package, stub: true },
+  { href: '/packages', label: 'Packages', icon: Package },
   { href: '/documents', label: 'Documents', icon: FileText },
   { href: '/approvals', label: 'Approvals', icon: CheckCircle2 },
   { href: '/commissions', label: 'Commissions', icon: Coins, stub: true },

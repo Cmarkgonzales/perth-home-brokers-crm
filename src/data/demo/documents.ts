@@ -6,6 +6,7 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00142',
     name: 'Passport',
     status: 'complete',
+    required: true,
     uploadedAt: '2026-03-10',
   },
   {
@@ -13,6 +14,7 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00142',
     name: "Driver's Licence",
     status: 'complete',
+    required: true,
     uploadedAt: '2026-03-10',
   },
   {
@@ -20,6 +22,7 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00142',
     name: 'Sarah Payslip',
     status: 'complete',
+    required: true,
     uploadedAt: '2026-03-17',
   },
   {
@@ -27,6 +30,7 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00142',
     name: 'James Payslip',
     status: 'complete',
+    required: true,
     uploadedAt: '2026-03-17',
   },
   {
@@ -34,12 +38,14 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00142',
     name: 'Bank Statement',
     status: 'missing',
+    required: true,
   },
   {
     id: 'doc-006',
     dealId: 'PHB-2026-00138',
     name: 'Builder Quote',
     status: 'review',
+    required: true,
     uploadedAt: '2026-03-14',
   },
   {
@@ -47,6 +53,23 @@ export const demoDocuments: Document[] = [
     dealId: 'PHB-2026-00138',
     name: 'Finance Pre-approval',
     status: 'complete',
+    required: true,
     uploadedAt: '2026-03-01',
+  },
+  {
+    id: 'doc-008',
+    dealId: 'PHB-2026-00138',
+    name: 'ID Verification',
+    status: 'complete',
+    required: true,
+    uploadedAt: '2026-02-28',
+  },
+  {
+    id: 'doc-009',
+    dealId: 'PHB-2026-00129',
+    name: 'Land Contract',
+    status: 'review',
+    required: true,
+    uploadedAt: '2026-03-12',
   },
 ]

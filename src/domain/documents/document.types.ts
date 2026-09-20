@@ -5,5 +5,6 @@ export interface Document {
   dealId: string
   name: string
   status: DocumentStatus
+  required: boolean
   uploadedAt?: string
 }

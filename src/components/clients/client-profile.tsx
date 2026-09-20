@@ -2,15 +2,20 @@ import Link from 'next/link'
 import {
   getActiveDealForClient,
   getActivitiesByDealId,
+  getCommunicationsByClientId,
   getDealsByClientId,
+  getDocumentsByDealId,
 } from '@/data/demo'
 import type { Client } from '@/domain/clients/client.types'
-import { formatCurrency, formatDate } from '@/lib/formatting'
+import { formatCurrency } from '@/lib/formatting'
+import { ActivityFeed } from '@/components/activities/activity-feed'
+import { CommunicationsLog } from '@/components/clients/communications-log'
 import { DealStageBadge } from '@/components/deals/deal-stage-badge'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AlertCircle, CheckCircle2, Clock } from 'lucide-react'
 
 interface ClientProfileProps {
   client: Client
@@ -20,7 +25,11 @@ export function ClientProfile ({ client }: ClientProfileProps) {
   const activeDeal = getActiveDealForClient(client.id)
   const clientDeals = getDealsByClientId(client.id)
   const activities = activeDeal
-    ? getActivitiesByDealId(activeDeal.id).slice(0, 5)
+    ? getActivitiesByDealId(activeDeal.id)
+    : []
+  const communications = getCommunicationsByClientId(client.id)
+  const dealDocuments = activeDeal
+    ? getDocumentsByDealId(activeDeal.id)
     : []
 
   return (
@@ -123,19 +132,7 @@ export function ClientProfile ({ client }: ClientProfileProps) {
                 <CardTitle className="text-base">Recent activity</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-4">
-                  {activities.map((activity) => (
-                    <li key={activity.id} className="border-l-2 border-border-strong pl-4">
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(activity.date)}
-                      </p>
-                      <p className="text-sm font-medium">{activity.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {activity.description}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                <ActivityFeed activities={activities} limit={5} />
               </CardContent>
             </Card>
           )}
@@ -170,38 +167,73 @@ export function ClientProfile ({ client }: ClientProfileProps) {
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">
-          <Card className="border-border shadow-none">
-            <CardContent className="py-8 text-center text-sm text-muted-foreground">
-              Document management is available from the deal workspace and documents hub.
-            </CardContent>
-          </Card>
+          {dealDocuments.length > 0 ? (
+            <Card className="border-border shadow-none">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base">Deal documents</CardTitle>
+                {activeDeal && (
+                  <Link
+                    href={`/documents?deal=${activeDeal.id}`}
+                    className="text-sm text-text-secondary hover:underline"
+                  >
+                    View in hub
+                  </Link>
+                )}
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {dealDocuments.map((doc) => (
+                    <li
+                      key={doc.id}
+                      className="flex items-center justify-between gap-2 text-sm"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        {doc.status === 'complete' && (
+                          <CheckCircle2 className="size-4 text-success" aria-hidden />
+                        )}
+                        {doc.status === 'missing' && (
+                          <AlertCircle className="size-4 text-danger" aria-hidden />
+                        )}
+                        {doc.status === 'review' && (
+                          <Clock className="size-4 text-warning" aria-hidden />
+                        )}
+                        {doc.name}
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className={
+                          doc.status === 'missing'
+                            ? 'bg-danger/10 text-danger'
+                            : doc.status === 'review'
+                              ? 'bg-warning/10 text-warning'
+                              : 'bg-success/10 text-success'
+                        }
+                      >
+                        {doc.status}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-border shadow-none">
+              <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                No documents for this client&apos;s active deal.
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="communications" className="mt-6">
-          <Card className="border-border shadow-none">
-            <CardContent className="py-8 text-center text-sm text-muted-foreground">
-              Communications log will be available in Plan 2.
-            </CardContent>
-          </Card>
+          <CommunicationsLog communications={communications} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-6">
           {activities.length > 0 ? (
             <Card className="border-border shadow-none">
               <CardContent className="pt-6">
-                <ul className="space-y-4">
-                  {activities.map((activity) => (
-                    <li key={activity.id} className="border-l-2 border-border-strong pl-4">
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(activity.date)}
-                      </p>
-                      <p className="text-sm font-medium">{activity.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {activity.description}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                <ActivityFeed activities={activities} />
               </CardContent>
             </Card>
           ) : (
