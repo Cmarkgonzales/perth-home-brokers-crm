@@ -1,7 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import type { Document } from '@/domain/documents/document.types'
+import type { AgentRun } from '@/domain/ai/agent.types'
+import { createDocumentAgentRun } from '@/domain/ai/mock-agent'
 import { formatDate } from '@/lib/formatting'
+import { AiDocumentCheck } from '@/components/ai/ai-document-check'
+import { AgentTrace } from '@/components/ai/agent-trace'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,7 +38,15 @@ export function DocumentDetailSheet ({
   open,
   onOpenChange,
 }: DocumentDetailSheetProps) {
+  const [agentRun, setAgentRun] = useState<AgentRun | null>(null)
+  const [agentComplete, setAgentComplete] = useState(false)
+
   if (!document) return null
+
+  function handleUploadClick () {
+    setAgentRun(createDocumentAgentRun(document!.name))
+    setAgentComplete(false)
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -68,7 +81,12 @@ export function DocumentDetailSheet ({
               <p className="mt-1 text-xs text-text-tertiary">
                 Drag and drop or click to browse. Upload is UI-only in this prototype.
               </p>
-              <Button variant="outline" size="sm" className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={handleUploadClick}
+              >
                 Choose file
               </Button>
             </div>
@@ -81,6 +99,18 @@ export function DocumentDetailSheet ({
                 This document requires broker verification before approval can proceed.
               </p>
             </div>
+          )}
+
+          {agentRun && !agentComplete && (
+            <AgentTrace
+              key={agentRun.id}
+              run={agentRun}
+              onComplete={() => setAgentComplete(true)}
+            />
+          )}
+
+          {(agentComplete || document.status === 'review') && (
+            <AiDocumentCheck documentId={document.id} />
           )}
         </div>
 

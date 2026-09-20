@@ -11,7 +11,7 @@ import { DealStageStepper } from '@/components/deals/deal-stage-stepper'
 import { NextActionCard } from '@/components/deals/next-action-card'
 import { DealDocumentsSummary } from '@/components/deals/deal-documents-summary'
 import { DealPackageSummary } from '@/components/deals/deal-package-summary'
-import { AiInsightPlaceholder } from '@/components/deals/ai-insight-placeholder'
+import { AiInsightCard } from '@/components/ai/ai-insight-card'
 import { DealTimeline } from '@/components/deals/deal-timeline'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -91,7 +91,7 @@ export function DealWorkspace ({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <NextActionCard deal={deal} />
-        <AiInsightPlaceholder dealName={deal.name} />
+        <AiInsightCard dealId={deal.id} dealName={deal.name} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

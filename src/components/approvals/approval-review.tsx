@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { AiApprovalSummary } from '@/components/ai/ai-approval-summary'
 import {
   AlertCircle,
   CheckCircle2,
@@ -163,6 +164,8 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
           </CardContent>
         </Card>
       </div>
+
+      <AiApprovalSummary approvalId={approval.id} />
 
       {status === 'pending' && (
         <div className="flex flex-wrap gap-2">

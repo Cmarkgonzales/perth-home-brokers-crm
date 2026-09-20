@@ -29,15 +29,14 @@ export const NAV_ITEMS: {
   { href: '/packages', label: 'Packages', icon: Package },
   { href: '/documents', label: 'Documents', icon: FileText },
   { href: '/approvals', label: 'Approvals', icon: CheckCircle2 },
-  { href: '/commissions', label: 'Commissions', icon: Coins, stub: true },
-  { href: '/reports', label: 'Reports', icon: BarChart3, stub: true },
+  { href: '/commissions', label: 'Commissions', icon: Coins },
+  { href: '/reports', label: 'Reports', icon: BarChart3 },
 ]
 
 export const SETTINGS_NAV_ITEM = {
   href: '/settings',
   label: 'Settings',
   icon: Settings,
-  stub: true,
 } as const
 
 export const AI_NAV_ITEM = {

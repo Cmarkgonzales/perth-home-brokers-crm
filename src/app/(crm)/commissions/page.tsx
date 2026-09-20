@@ -1,18 +1,19 @@
+import { demoCommissions, getCommissionSummary } from '@/data/demo/commissions'
 import { PageHeader } from '@/components/layout/page-header'
-import { Card, CardContent } from '@/components/ui/card'
+import { CommissionSummaryCards } from '@/components/commissions/commission-summary-cards'
+import { CommissionTable } from '@/components/commissions/commission-table'
 
 export default function CommissionsPage () {
+  const summary = getCommissionSummary()
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Commissions"
-        description="Commission tracking arrives in Plan 3."
+        description={`Commission tracking for ${summary.period}.`}
       />
-      <Card>
-        <CardContent className="py-8 text-center text-sm text-text-secondary">
-          Pipeline commission, expected, and paid views will be available here.
-        </CardContent>
-      </Card>
+      <CommissionSummaryCards summary={summary} />
+      <CommissionTable commissions={demoCommissions} />
     </div>
   )
 }

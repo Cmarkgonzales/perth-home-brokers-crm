@@ -6,15 +6,22 @@ import {
   getPipelineCounts,
   getPipelineValue,
 } from '@/data/demo'
+import { getCommissionSummary } from '@/data/demo/commissions'
 import { CURRENT_USER } from '@/lib/constants'
 import { formatCurrency, getGreeting } from '@/lib/formatting'
 import { MetricCard } from '@/components/dashboard/metric-card'
 import { NeedsAttentionList } from '@/components/dashboard/needs-attention-list'
 import { PipelineBar } from '@/components/dashboard/pipeline-bar'
+import { PipelineChart } from '@/components/dashboard/pipeline-chart'
+import { AiBusinessBrief } from '@/components/dashboard/ai-business-brief'
+import { CommissionSnapshot } from '@/components/dashboard/commission-snapshot'
+import { getBriefing } from '@/domain/ai/mock-copilot'
 
 export default function DashboardPage () {
   const pipelineStages = getPipelineCounts()
   const attentionItems = getAttentionItems()
+  const commissionSummary = getCommissionSummary()
+  const briefing = getBriefing()
 
   return (
     <div className="space-y-8">
@@ -56,9 +63,16 @@ export default function DashboardPage () {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
+        <PipelineChart stages={pipelineStages} />
+        <AiBusinessBrief items={briefing.items} headline={briefing.headline} />
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-2">
         <PipelineBar stages={pipelineStages} />
         <NeedsAttentionList items={attentionItems} />
       </div>
+
+      <CommissionSnapshot summary={commissionSummary} />
     </div>
   )
 }

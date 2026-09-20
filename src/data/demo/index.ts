@@ -7,6 +7,11 @@ export { demoApprovals } from '@/data/demo/approvals'
 export { demoTasks } from '@/data/demo/tasks'
 export { demoCommunications } from '@/data/demo/communications'
 export {
+  demoCommissions,
+  getCommissionByDealId,
+  getCommissionSummary,
+} from '@/data/demo/commissions'
+export {
   demoLandLots,
   demoHouseDesigns,
   demoPackageExtras,

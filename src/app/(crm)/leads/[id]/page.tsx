@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getLeadById } from '@/data/demo'
 import { formatCurrency } from '@/lib/formatting'
+import { AiLeadAssessment } from '@/components/ai/ai-lead-assessment'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -32,7 +33,10 @@ export default async function LeadDetailPage ({
           </h1>
           <p className="text-sm text-text-secondary">{lead.source}</p>
         </div>
-        <Badge variant="secondary">{lead.status}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{lead.status}</Badge>
+          <AiLeadAssessment leadId={lead.id} leadName={lead.name} />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
