@@ -1,3 +1,4 @@
+import { getDashboardSnapshot } from '@/data/demo/dashboard'
 import { DEMO_DEAL_ID } from '@/lib/constants'
 import { matchResponseKey } from '@/data/demo/ai-responses'
 import type {
@@ -17,23 +18,26 @@ function nextId (): string {
 }
 
 export function getBriefing (): AiBriefing {
+  const snapshot = getDashboardSnapshot()
+  const { briefing } = snapshot
+
   return {
-    headline: '7 deals require attention',
+    headline: briefing.headline,
+    overdueApprovals: briefing.overdueApprovals,
+    missingDocuments: briefing.missingDocuments,
+    criticalCount: briefing.criticalCount,
+    prompt: briefing.prompt,
     items: [
       {
-        text: '2 critical — Michael Chen approval overdue, Williams finance docs incomplete',
+        text: `${briefing.overdueApprovals} approvals overdue`,
         severity: 'critical',
       },
       {
-        text: '3 finance applications waiting on lender response',
+        text: `${briefing.missingDocuments} documents missing`,
         severity: 'warning',
       },
       {
-        text: '2 clients have missing documents',
-        severity: 'warning',
-      },
-      {
-        text: '1 approval waiting 3+ days',
+        text: `${briefing.criticalCount} critical`,
         severity: 'critical',
       },
     ],

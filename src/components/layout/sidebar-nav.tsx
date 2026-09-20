@@ -7,7 +7,7 @@ import { BrandMark } from '@/components/layout/brand-mark'
 import { cn } from '@/lib/utils'
 import {
   AI_NAV_ITEM,
-  NAV_ITEMS,
+  NAV_SECTIONS,
   SETTINGS_NAV_ITEM,
 } from '@/lib/constants'
 
@@ -38,8 +38,8 @@ function NavLink ({
       className={cn(
         'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors lg:py-2',
         isActive
-          ? 'border-l-[3px] border-phb-red bg-surface-strong pl-[calc(0.75rem-3px)] text-text-primary'
-          : 'border-l-[3px] border-transparent text-sidebar-text hover:bg-surface-muted hover:text-text-primary'
+          ? 'bg-surface-strong pl-[calc(0.75rem-3px)] text-text-primary'
+          : 'text-sidebar-text hover:bg-surface-muted hover:text-text-primary'
       )}
     >
       <Icon
@@ -73,18 +73,36 @@ export function SidebarNav () {
   const AiIcon = AI_NAV_ITEM.icon
 
   return (
-    <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
-      {NAV_ITEMS.map((item) => (
-        <NavLink
-          key={item.href}
-          href={item.href}
-          label={item.label}
-          icon={item.icon}
-          isActive={isActiveRoute(pathname, item.href)}
-        />
-      ))}
+    <nav className="flex flex-1 flex-col overflow-y-auto p-3">
+      <div className="flex flex-col gap-4">
+        {NAV_SECTIONS.map((section) => {
+          const headingId = `nav-${section.id}`
 
-      <div className="my-2 border-t border-sidebar-border" />
+          return (
+            <section key={section.id} aria-labelledby={headingId}>
+              <h2
+                id={headingId}
+                className="px-3 pb-1 text-[11px] font-medium tracking-wide text-text-tertiary uppercase"
+              >
+                {section.label}
+              </h2>
+              <div className="flex flex-col gap-0.5">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    icon={item.icon}
+                    isActive={isActiveRoute(pathname, item.href)}
+                  />
+                ))}
+              </div>
+            </section>
+          )
+        })}
+      </div>
+
+      <div className="my-3 border-t border-sidebar-border" />
 
       <NavLink
         href={AI_NAV_ITEM.href}

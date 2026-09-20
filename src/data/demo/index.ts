@@ -45,9 +45,17 @@ export {
   getAtRiskDealsCount,
   getPipelineValue,
   getAttentionItems,
+  getPipelineGroupCounts,
+  getOverdueApprovalCount,
+  getMissingRequiredDocumentCount,
   filterDealsByStage,
+  filterDeals,
+  filterLeadsByStatus,
+  isLeadStatus,
+  isDueDateOverdue,
   searchCrmRecords,
 } from '@/data/demo/helpers'
+export { getDashboardSnapshot } from '@/data/demo/dashboard'
 export type {
   AttentionItem,
   PipelineStageCount,

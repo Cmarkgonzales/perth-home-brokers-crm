@@ -14,7 +14,11 @@ import { AiCopilot } from '@/components/ai/ai-copilot'
 import { AgentTrace } from '@/components/ai/agent-trace'
 import { AgentApprovalGate } from '@/components/ai/agent-approval-gate'
 
-export function AiCopilotWithAgents () {
+export function AiCopilotWithAgents ({
+  initialPrompt,
+}: {
+  initialPrompt?: string
+}) {
   const [agentRun, setAgentRun] = useState<AgentRun | null>(null)
   const [showApproval, setShowApproval] = useState(false)
   const [extraMessages, setExtraMessages] = useState<AiMessage[]>([])
@@ -91,6 +95,7 @@ export function AiCopilotWithAgents () {
 
       <AiCopilot
         appendedMessages={extraMessages}
+        initialPrompt={initialPrompt}
         onAgentPrompt={handleAgentPrompt}
       />
     </div>

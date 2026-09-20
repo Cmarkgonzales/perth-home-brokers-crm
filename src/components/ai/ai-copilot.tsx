@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { AiMessage } from '@/domain/ai/ai.types'
 import { AI_SUGGESTIONS } from '@/data/demo/ai-responses'
 import {
@@ -16,12 +16,14 @@ import { Sparkles, Send } from 'lucide-react'
 interface AiCopilotProps {
   initialMessages?: AiMessage[]
   appendedMessages?: AiMessage[]
+  initialPrompt?: string
   onAgentPrompt?: (prompt: string) => void
 }
 
 export function AiCopilot ({
   initialMessages = [],
   appendedMessages = [],
+  initialPrompt,
   onAgentPrompt,
 }: AiCopilotProps) {
   const [messages, setMessages] = useState<AiMessage[]>(initialMessages)
@@ -53,12 +55,40 @@ export function AiCopilot ({
     }, 600)
   }
 
+  useEffect(() => {
+    const prompt = initialPrompt?.trim()
+    if (!prompt) return
+
+    const startId = window.setTimeout(() => {
+      setMessages((prev) => {
+        if (prev.some((message) => message.role === 'user' && message.content === prompt)) {
+          return prev
+        }
+        return [...prev, createUserMessage(prompt)]
+      })
+      setIsThinking(true)
+      onAgentPrompt?.(prompt)
+    }, 0)
+
+    const doneId = window.setTimeout(() => {
+      setMessages((prev) => {
+        if (prev.some((message) => message.role === 'assistant')) return prev
+        return [...prev, generateResponse(prompt)]
+      })
+      setIsThinking(false)
+    }, 600)
+
+    return () => {
+      window.clearTimeout(startId)
+      window.clearTimeout(doneId)
+    }
+  }, [initialPrompt]) // eslint-disable-line react-hooks/exhaustive-deps -- send dashboard CTA prompt once
+
   return (
     <div className="flex h-[calc(100svh-14rem)] min-h-[24rem] flex-col rounded-xl border border-border bg-surface sm:min-h-[480px] lg:h-[calc(100vh-12rem)]">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-border px-4 py-3">
         <Sparkles className="size-4 text-phb-yellow-dark" aria-hidden />
         <span className="text-sm font-semibold text-text-primary">PHB AI Copilot</span>
-        <span className="text-xs text-text-tertiary">Demo · mock responses</span>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -98,7 +128,7 @@ export function AiCopilot ({
             event.preventDefault()
             handleSubmit(input)
           }}
-          className="flex gap-2"
+          className="flex items-stretch gap-2"
         >
           <Textarea
             value={input}
@@ -109,11 +139,12 @@ export function AiCopilot ({
           />
           <Button
             type="submit"
+            variant="brand"
             disabled={!input.trim() || isThinking}
-            className="shrink-0 bg-phb-yellow text-text-primary hover:bg-phb-yellow-dark"
+            className="h-auto min-h-[60px] self-stretch px-3.5"
           >
             <Send className="size-4" aria-hidden />
-            <span className="sr-only">Send</span>
+            Send
           </Button>
         </form>
       </div>

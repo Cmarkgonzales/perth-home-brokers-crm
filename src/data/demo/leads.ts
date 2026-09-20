@@ -44,6 +44,26 @@ export const demoLeads: Lead[] = [
     phone: '0422 345 678',
     clientId: 'client-003',
   },
+  {
+    id: 'lead-005',
+    name: "Liam O'Brien",
+    source: 'Website enquiry',
+    budget: 590000,
+    status: 'New',
+    owner: 'James',
+    email: 'liam.obrien@example.com',
+    phone: '0444 567 890',
+  },
+  {
+    id: 'lead-006',
+    name: 'Jack Turner',
+    source: 'Referral',
+    budget: 640000,
+    status: 'New',
+    owner: 'Arvin',
+    email: 'jack.turner@example.com',
+    phone: '0455 678 901',
+  },
 ]
 
 export const demoLead = demoLeads[0]

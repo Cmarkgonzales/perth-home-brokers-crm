@@ -13,6 +13,10 @@ export const DEAL_STAGES: DealStage[] = [
   'settlement',
 ]
 
+export function isDealStage (value: string): value is DealStage {
+  return (DEAL_STAGES as readonly string[]).includes(value)
+}
+
 export function getStageIndex (stage: DealStage): number {
   return DEAL_STAGES.indexOf(stage)
 }

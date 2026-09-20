@@ -1,78 +1,46 @@
-import {
-  getActiveDealsCount,
-  getAttentionItems,
-  getAtRiskDealsCount,
-  getNewLeadsCount,
-  getPipelineCounts,
-  getPipelineValue,
-} from '@/data/demo'
-import { getCommissionSummary } from '@/data/demo/commissions'
-import { CURRENT_USER } from '@/lib/constants'
-import { formatCurrency, getGreeting } from '@/lib/formatting'
-import { MetricCard } from '@/components/dashboard/metric-card'
+import { demoClients, getDashboardSnapshot } from '@/data/demo'
+import { getGreeting } from '@/lib/formatting'
+import { pageTitleClass } from '@/components/layout/page-header'
+import { DashboardMetricCard } from '@/components/dashboard/dashboard-metric-card'
 import { NeedsAttentionList } from '@/components/dashboard/needs-attention-list'
-import { PipelineBar } from '@/components/dashboard/pipeline-bar'
 import { PipelineChart } from '@/components/dashboard/pipeline-chart'
 import { AiBusinessBrief } from '@/components/dashboard/ai-business-brief'
-import { CommissionSnapshot } from '@/components/dashboard/commission-snapshot'
-import { getBriefing } from '@/domain/ai/mock-copilot'
+import { NewDealDialog } from '@/components/deals/new-deal-dialog'
+
+export const dynamic = 'force-dynamic'
 
 export default function DashboardPage () {
-  const pipelineStages = getPipelineCounts()
-  const attentionItems = getAttentionItems()
-  const commissionSummary = getCommissionSummary()
-  const briefing = getBriefing()
+  const snapshot = getDashboardSnapshot()
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[32px]">
-          Dashboard
-        </h1>
-        <p className="mt-2 text-sm text-text-secondary">
-          {getGreeting()}, {CURRENT_USER.name.split(' ')[0]}. Here&apos;s
-          what&apos;s happening across PHB today.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className={pageTitleClass} suppressHydrationWarning>
+            {getGreeting()}, {snapshot.greetingName}
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Here&apos;s what needs your attention today.
+          </p>
+        </div>
+        <NewDealDialog clients={demoClients} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          label="Active deals"
-          value={String(getActiveDealsCount())}
-          hint="Excluding settled deals"
-          accent="brand"
-        />
-        <MetricCard
-          label="New leads"
-          value={String(getNewLeadsCount())}
-          hint="Awaiting first contact"
-          accent="action"
-        />
-        <MetricCard
-          label="At risk"
-          value={String(getAtRiskDealsCount())}
-          hint="Needs immediate attention"
-          accent="danger"
-        />
-        <MetricCard
-          label="Pipeline value"
-          value={formatCurrency(getPipelineValue())}
-          hint="Active deal total"
-          accent="neutral"
-        />
+        {snapshot.metrics.map((metric) => (
+          <DashboardMetricCard key={metric.id} metric={metric} />
+        ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <PipelineChart stages={pipelineStages} />
-        <AiBusinessBrief items={briefing.items} headline={briefing.headline} />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(18rem,1fr)] lg:gap-6">
+        <PipelineChart
+          stages={snapshot.pipeline}
+          dealCount={snapshot.pipelineDealCount}
+        />
+        <AiBusinessBrief briefing={snapshot.briefing} />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <PipelineBar stages={pipelineStages} />
-        <NeedsAttentionList items={attentionItems} />
-      </div>
-
-      <CommissionSnapshot summary={commissionSummary} />
+      <NeedsAttentionList items={snapshot.attentionItems} />
     </div>
   )
 }

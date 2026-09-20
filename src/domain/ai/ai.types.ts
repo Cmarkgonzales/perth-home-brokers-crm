@@ -26,6 +26,10 @@ export interface AiSuggestion {
 
 export interface AiBriefing {
   headline: string
+  overdueApprovals: number
+  missingDocuments: number
+  criticalCount: number
+  prompt: string
   items: {
     text: string
     severity?: 'critical' | 'warning' | 'info'

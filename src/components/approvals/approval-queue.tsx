@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Approval } from '@/domain/approvals/approval.types'
+import { isDueDateOverdue } from '@/data/demo'
 import { formatCurrency, formatDate } from '@/lib/formatting'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,7 +12,7 @@ interface ApprovalQueueProps {
 }
 
 function isOverdue (dueDate: string): boolean {
-  return dueDate < '2026-03-20'
+  return isDueDateOverdue(dueDate)
 }
 
 export function ApprovalQueue ({ approvals }: ApprovalQueueProps) {
