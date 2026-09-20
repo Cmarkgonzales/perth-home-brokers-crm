@@ -14,7 +14,9 @@ import {
   Users,
 } from 'lucide-react'
 
-export const APP_NAME = 'PHB Command Center'
+export const APP_NAME = 'Command Center'
+
+export const ORG_NAME = 'Perth Home Brokers'
 
 export const NAV_ITEMS: {
   href: string
@@ -64,4 +66,5 @@ export const CURRENT_USER = {
   name: 'Nitesh Jha',
   initials: 'NJ',
   role: 'Broker',
+  organisation: ORG_NAME,
 } as const

@@ -1,5 +1,6 @@
 import type { DealStage } from '@/domain/deals/deal.types'
 import { DEAL_STAGES } from '@/domain/deals/deal-stage'
+import { searchCrm } from '@/domain/search/search-crm'
 import { demoActivities } from '@/data/demo/activities'
 import { demoApprovals } from '@/data/demo/approvals'
 import { demoClients } from '@/data/demo/clients'
@@ -182,4 +183,13 @@ export function getAttentionItems (): AttentionItem[] {
 export function filterDealsByStage (stage?: DealStage) {
   if (!stage || !DEAL_STAGES.includes(stage)) return demoDeals
   return demoDeals.filter((deal) => deal.stage === stage)
+}
+
+export function searchCrmRecords (query: string) {
+  return searchCrm({
+    query,
+    leads: demoLeads,
+    clients: demoClients,
+    deals: demoDeals,
+  })
 }

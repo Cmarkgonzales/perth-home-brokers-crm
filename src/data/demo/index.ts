@@ -1,3 +1,5 @@
+export { demoNotifications } from '@/data/demo/notifications'
+export type { AppNotification, NotificationKind } from '@/data/demo/notifications'
 export { demoClients, demoClient } from '@/data/demo/clients'
 export { demoDeals, demoDeal } from '@/data/demo/deals'
 export { demoLeads, demoLead } from '@/data/demo/leads'
@@ -44,6 +46,7 @@ export {
   getPipelineValue,
   getAttentionItems,
   filterDealsByStage,
+  searchCrmRecords,
 } from '@/data/demo/helpers'
 export type {
   AttentionItem,

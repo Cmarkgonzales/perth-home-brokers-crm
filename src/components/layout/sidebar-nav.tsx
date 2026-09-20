@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
+import { BrandMark } from '@/components/layout/brand-mark'
 import { cn } from '@/lib/utils'
 import {
   AI_NAV_ITEM,
@@ -55,13 +56,13 @@ function NavLink ({
 
 export function SidebarBrand ({ className }: { className?: string }) {
   return (
-    <div className={cn('border-b border-sidebar-border px-4 py-5', className)}>
-      <p className="text-xs font-semibold tracking-[0.16em] text-phb-red uppercase">
-        Perth Home Brokers
-      </p>
-      <p className="mt-1 text-sm font-semibold text-text-primary">
-        Command Center
-      </p>
+    <div
+      className={cn(
+        'flex h-14 shrink-0 items-center border-b border-border px-4',
+        className
+      )}
+    >
+      <BrandMark />
     </div>
   )
 }
