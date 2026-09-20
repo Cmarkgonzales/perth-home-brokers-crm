@@ -32,18 +32,18 @@ export function PipelineChart ({ stages }: PipelineChartProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[220px] w-full">
+        <div className="h-[260px] w-full sm:h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#626262' }}
+                tick={{ fontSize: 10, fill: '#626262' }}
                 axisLine={false}
                 tickLine={false}
-                interval={0}
-                angle={-25}
+                interval="preserveStartEnd"
+                angle={-35}
                 textAnchor="end"
-                height={60}
+                height={64}
               />
               <YAxis
                 allowDecimals={false}

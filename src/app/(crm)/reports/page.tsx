@@ -12,12 +12,12 @@ export default function ReportsPage () {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <PageHeader
           title="Reports"
           description="Pipeline analytics and conversion metrics from demo data."
         />
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="w-fit gap-2">
           <Download className="size-4" aria-hidden />
           Export report
         </Button>

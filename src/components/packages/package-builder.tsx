@@ -75,7 +75,7 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
         >
           ← Back to packages
         </Link>
-        <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[32px]">
           Package Builder
         </h1>
         <p className="text-sm text-text-secondary">
@@ -120,14 +120,14 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
                 type="button"
                 onClick={() => toggleExtra(extra.id)}
                 className={cn(
-                  'flex items-center justify-between rounded-lg border p-3 text-left text-sm transition-colors',
+                  'flex flex-col gap-1 rounded-lg border p-3 text-left text-sm transition-colors sm:flex-row sm:items-center sm:justify-between',
                   checked
                     ? 'border-phb-yellow bg-[#FFFCF0]'
                     : 'border-border hover:bg-surface-muted'
                 )}
               >
                 <span>{extra.name}</span>
-                <span className="font-medium">
+                <span className="font-medium tabular-nums">
                   +{formatCurrency(extra.price)}
                 </span>
               </button>

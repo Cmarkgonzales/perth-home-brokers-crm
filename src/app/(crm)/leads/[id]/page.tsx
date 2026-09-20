@@ -28,12 +28,12 @@ export default async function LeadDetailPage ({
           >
             ← Back to leads
           </Link>
-          <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+          <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[32px]">
             {lead.name}
           </h1>
           <p className="text-sm text-text-secondary">{lead.source}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{lead.status}</Badge>
           <AiLeadAssessment leadId={lead.id} leadName={lead.name} />
         </div>

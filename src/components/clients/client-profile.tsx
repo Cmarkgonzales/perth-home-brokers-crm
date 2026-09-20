@@ -42,7 +42,7 @@ export function ClientProfile ({ client }: ClientProfileProps) {
           >
             ← Back to clients
           </Link>
-          <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
             {client.name}
           </h1>
           <p className="text-sm text-text-secondary">{client.type}</p>
@@ -51,13 +51,15 @@ export function ClientProfile ({ client }: ClientProfileProps) {
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="deal">Deal</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="communications">Communications</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+          <TabsList className="h-auto w-max flex-wrap justify-start sm:w-fit">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="deal">Deal</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="communications">Communications</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="mt-6 space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -148,7 +150,7 @@ export function ClientProfile ({ client }: ClientProfileProps) {
                 <Link
                   key={deal.id}
                   href={`/deals/${deal.id}`}
-                  className="flex items-center justify-between rounded-lg border border-border p-3 transition-colors hover:bg-table-hover"
+                  className="flex flex-col gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-table-hover sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="font-medium">{deal.name}</p>
@@ -185,7 +187,7 @@ export function ClientProfile ({ client }: ClientProfileProps) {
                   {dealDocuments.map((doc) => (
                     <li
                       key={doc.id}
-                      className="flex items-center justify-between gap-2 text-sm"
+                      className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between"
                     >
                       <span className="inline-flex items-center gap-2">
                         {doc.status === 'complete' && (

@@ -29,49 +29,88 @@ function getClientDealSummary (clientId: string) {
 
 export function ClientsTable ({ clients }: ClientsTableProps) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Client</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Location</TableHead>
-          <TableHead>Deals</TableHead>
-          <TableHead>Active stage</TableHead>
-          <TableHead>Owner</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      <ul className="divide-y divide-border md:hidden">
         {clients.map((client) => {
           const { dealCount, activeDeal } = getClientDealSummary(client.id)
 
           return (
-            <TableRow key={client.id}>
-              <TableCell>
-                <Link
-                  href={`/clients/${client.id}`}
-                  className="font-medium text-text-primary hover:underline"
-                >
-                  {client.name}
-                </Link>
-                <p className="text-xs text-text-tertiary">{client.email}</p>
-              </TableCell>
-              <TableCell>
+            <li key={client.id} className="p-4">
+              <Link
+                href={`/clients/${client.id}`}
+                className="font-medium text-text-primary hover:underline"
+              >
+                {client.name}
+              </Link>
+              <p className="text-xs text-text-tertiary">{client.email}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">{client.type}</Badge>
-              </TableCell>
-              <TableCell>{client.location}</TableCell>
-              <TableCell>{dealCount}</TableCell>
-              <TableCell>
+                <span className="text-sm text-text-secondary">{client.location}</span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                <span className="text-text-tertiary">
+                  {dealCount} {dealCount === 1 ? 'deal' : 'deals'}
+                </span>
                 {activeDeal ? (
                   <DealStageBadge stage={activeDeal.stage} />
                 ) : (
                   <span className="text-muted-foreground">—</span>
                 )}
-              </TableCell>
-              <TableCell>{activeDeal?.owner ?? '—'}</TableCell>
-            </TableRow>
+                <span className="text-text-secondary">
+                  {activeDeal?.owner ?? '—'}
+                </span>
+              </div>
+            </li>
           )
         })}
-      </TableBody>
-    </Table>
+      </ul>
+
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Client</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Deals</TableHead>
+              <TableHead>Active stage</TableHead>
+              <TableHead>Owner</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clients.map((client) => {
+              const { dealCount, activeDeal } = getClientDealSummary(client.id)
+
+              return (
+                <TableRow key={client.id}>
+                  <TableCell>
+                    <Link
+                      href={`/clients/${client.id}`}
+                      className="font-medium text-text-primary hover:underline"
+                    >
+                      {client.name}
+                    </Link>
+                    <p className="text-xs text-text-tertiary">{client.email}</p>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{client.type}</Badge>
+                  </TableCell>
+                  <TableCell>{client.location}</TableCell>
+                  <TableCell>{dealCount}</TableCell>
+                  <TableCell>
+                    {activeDeal ? (
+                      <DealStageBadge stage={activeDeal.stage} />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>{activeDeal?.owner ?? '—'}</TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }

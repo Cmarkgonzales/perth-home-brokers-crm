@@ -10,7 +10,7 @@ interface CommissionSnapshotProps {
 export function CommissionSnapshot ({ summary }: CommissionSnapshotProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-col gap-2 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <CardTitle className="text-base font-semibold">
           Commissions · {summary.period}
         </CardTitle>
@@ -22,7 +22,7 @@ export function CommissionSnapshot ({ summary }: CommissionSnapshotProps) {
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-text-tertiary">
               Pipeline

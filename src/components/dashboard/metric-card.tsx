@@ -29,7 +29,7 @@ export function MetricCard ({
         <p className="text-xs font-medium tracking-wide text-text-tertiary uppercase">
           {label}
         </p>
-        <p className="mt-1 text-[32px] leading-none font-semibold tracking-tight text-text-primary">
+        <p className="mt-1 text-[28px] leading-none font-semibold tracking-tight break-words text-text-primary tabular-nums sm:text-[32px]">
           {value}
         </p>
         {hint && (

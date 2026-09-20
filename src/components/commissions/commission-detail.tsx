@@ -53,7 +53,7 @@ export function CommissionDetail ({ commission }: CommissionDetailProps) {
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+            <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
               {commission.dealName}
             </h1>
             <p className="text-sm text-text-secondary">

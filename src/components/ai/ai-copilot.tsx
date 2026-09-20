@@ -54,8 +54,8 @@ export function AiCopilot ({
   }
 
   return (
-    <div className="flex h-[calc(100vh-12rem)] min-h-[480px] flex-col rounded-xl border border-border bg-surface">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+    <div className="flex h-[calc(100svh-14rem)] min-h-[24rem] flex-col rounded-xl border border-border bg-surface sm:min-h-[480px] lg:h-[calc(100vh-12rem)]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-border px-4 py-3">
         <Sparkles className="size-4 text-phb-yellow-dark" aria-hidden />
         <span className="text-sm font-semibold text-text-primary">PHB AI Copilot</span>
         <span className="text-xs text-text-tertiary">Demo · mock responses</span>

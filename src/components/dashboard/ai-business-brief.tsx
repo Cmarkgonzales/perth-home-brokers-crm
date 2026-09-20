@@ -47,7 +47,7 @@ export function AiBusinessBrief ({
         </ul>
         <Link
           href="/ai"
-          className="inline-flex h-8 items-center rounded-lg border border-phb-yellow/40 bg-white px-2.5 text-sm font-medium hover:bg-[#FFF9E5]"
+          className="inline-flex h-auto min-h-8 items-center rounded-lg border border-phb-yellow/40 bg-white px-2.5 py-1.5 text-sm font-medium hover:bg-[#FFF9E5]"
         >
           Ask AI → What should I focus on today?
         </Link>

@@ -24,9 +24,9 @@ export default function DashboardPage () {
   const briefing = getBriefing()
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[32px]">
           Dashboard
         </h1>
         <p className="mt-2 text-sm text-text-secondary">

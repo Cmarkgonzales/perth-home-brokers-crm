@@ -40,19 +40,19 @@ export function DealWorkspace ({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <Link
             href="/deals"
             className="mb-2 inline-block text-sm text-muted-foreground hover:text-foreground"
           >
             ← Back to deals
           </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+          <div className="flex items-start gap-2">
+            <h1 className="min-w-0 text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
               {deal.name}
             </h1>
             {deal.atRisk && (
-              <AlertTriangle className="size-5 text-danger" aria-label="At risk" />
+              <AlertTriangle className="size-5 shrink-0 text-danger" aria-label="At risk" />
             )}
           </div>
           <p className="font-mono text-sm text-text-tertiary">{deal.id}</p>
@@ -65,8 +65,8 @@ export function DealWorkspace ({
             </Link>
           )}
         </div>
-        <div className="text-right">
-          <p className="text-[32px] font-semibold tracking-tight text-text-primary">
+        <div className="w-full text-left sm:w-auto sm:text-right">
+          <p className="text-2xl font-semibold tracking-tight text-text-primary tabular-nums sm:text-[32px]">
             {formatCurrency(deal.value)}
           </p>
           <DealStageBadge stage={deal.stage} className="mt-2" />
@@ -113,7 +113,7 @@ export function DealWorkspace ({
               {tasks.map((task) => (
                 <li
                   key={task.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border p-3 text-sm"
+                  className="flex flex-col gap-2 rounded-lg border border-border p-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                 >
                   <div>
                     <p className="font-medium">{task.title}</p>

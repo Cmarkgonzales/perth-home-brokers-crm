@@ -38,8 +38,8 @@ export function ApprovalQueue ({ approvals }: ApprovalQueueProps) {
                 overdue && 'border-warning/40'
               )}
             >
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div>
+              <CardHeader className="flex flex-col items-start gap-3 pb-2 sm:flex-row sm:justify-between">
+                <div className="min-w-0">
                   <CardTitle className="text-base font-semibold">
                     {approval.title}
                   </CardTitle>

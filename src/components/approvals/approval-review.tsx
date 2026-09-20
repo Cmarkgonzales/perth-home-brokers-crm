@@ -65,7 +65,7 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+            <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
               {approval.title}
             </h1>
             <p className="text-sm text-text-secondary">
@@ -139,7 +139,7 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
                 {documents.map((doc) => (
                   <li
                     key={doc.id}
-                    className="flex items-center justify-between gap-2 text-sm"
+                    className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between"
                   >
                     <span className="inline-flex items-center gap-2">
                       <DocumentStatusIcon status={doc.status} />

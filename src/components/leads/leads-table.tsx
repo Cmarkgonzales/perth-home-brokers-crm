@@ -55,7 +55,7 @@ export function LeadsTable ({ leads }: LeadsTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
+      <div className="relative w-full max-w-sm">
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
@@ -68,42 +68,70 @@ export function LeadsTable ({ leads }: LeadsTableProps) {
       </div>
 
       <Card className="overflow-hidden gap-0 py-0">
-        <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Source</TableHead>
-            <TableHead>Budget</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Owner</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+        <ul className="divide-y divide-border md:hidden">
           {filteredLeads.map((lead) => (
-            <TableRow key={lead.id}>
-              <TableCell>
-                <Link
-                  href={`/leads/${lead.id}`}
-                  className="font-medium text-text-primary hover:underline"
-                >
-                  {lead.name}
-                </Link>
-              </TableCell>
-              <TableCell>{lead.source}</TableCell>
-              <TableCell>{formatCurrency(lead.budget)}</TableCell>
-              <TableCell>
-                <Badge
-                  variant="secondary"
-                  className={cn(getStatusVariant(lead.status))}
-                >
-                  {lead.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{lead.owner}</TableCell>
-            </TableRow>
+            <li key={lead.id} className="p-4">
+              <Link
+                href={`/leads/${lead.id}`}
+                className="font-medium text-text-primary hover:underline"
+              >
+                {lead.name}
+              </Link>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+                <span>{lead.source}</span>
+                <span aria-hidden>·</span>
+                <span className="tabular-nums">{formatCurrency(lead.budget)}</span>
+                <span aria-hidden>·</span>
+                <span>{lead.owner}</span>
+              </div>
+              <Badge
+                variant="secondary"
+                className={cn('mt-3', getStatusVariant(lead.status))}
+              >
+                {lead.status}
+              </Badge>
+            </li>
           ))}
-        </TableBody>
-        </Table>
+        </ul>
+
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Budget</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Owner</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredLeads.map((lead) => (
+                <TableRow key={lead.id}>
+                  <TableCell>
+                    <Link
+                      href={`/leads/${lead.id}`}
+                      className="font-medium text-text-primary hover:underline"
+                    >
+                      {lead.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{lead.source}</TableCell>
+                  <TableCell>{formatCurrency(lead.budget)}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="secondary"
+                      className={cn(getStatusVariant(lead.status))}
+                    >
+                      {lead.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{lead.owner}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
     </div>
   )

@@ -42,7 +42,7 @@ export function DealDocumentsSummary ({
           {requiredDocs.map((doc) => (
             <li
               key={doc.id}
-              className="flex items-center justify-between gap-2 text-sm"
+              className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between"
             >
               <span className="inline-flex items-center gap-2">
                 <DocumentStatusIcon status={doc.status} />

@@ -24,7 +24,7 @@ export default async function DealTimelinePage ({
         >
           ← Back to deal workspace
         </Link>
-        <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+        <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
           {deal.name} — Timeline
         </h1>
         <p className="font-mono text-sm text-text-tertiary">{deal.id}</p>

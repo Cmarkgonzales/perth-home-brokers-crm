@@ -37,8 +37,8 @@ export function DealCycleChart ({ metrics, monthlySettlements }: DealCycleChartP
                 <YAxis
                   type="category"
                   dataKey="label"
-                  width={120}
-                  tick={{ fontSize: 11, fill: '#626262' }}
+                  width={88}
+                  tick={{ fontSize: 10, fill: '#626262' }}
                 />
                 <Tooltip
                   contentStyle={{

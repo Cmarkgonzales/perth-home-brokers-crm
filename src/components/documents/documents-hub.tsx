@@ -65,8 +65,8 @@ export function DocumentsHub ({ groups, initialDealFilter }: DocumentsHubProps) 
 
           return (
             <Card key={group.dealId} className="border-border shadow-none">
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div>
+              <CardHeader className="flex flex-col items-start gap-3 pb-2 sm:flex-row sm:justify-between">
+                <div className="min-w-0">
                   <CardTitle className="text-base font-semibold">
                     {group.dealName}
                   </CardTitle>
@@ -80,7 +80,7 @@ export function DocumentsHub ({ groups, initialDealFilter }: DocumentsHubProps) 
                     </Link>
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {group.missingCount > 0 && (
                     <Badge variant="secondary" className="bg-danger/10 text-danger">
                       {group.missingCount} missing
@@ -98,18 +98,18 @@ export function DocumentsHub ({ groups, initialDealFilter }: DocumentsHubProps) 
                       <button
                         type="button"
                         onClick={() => openDocument(doc, group.dealName)}
-                        className="flex w-full items-center justify-between gap-3 py-3 text-left text-sm transition-colors hover:bg-table-hover rounded-lg px-2 -mx-2"
+                        className="-mx-2 flex w-full flex-col items-start gap-2 rounded-lg px-2 py-3 text-left text-sm transition-colors hover:bg-table-hover sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex min-w-0 items-center gap-2">
                           <DocumentStatusIcon status={doc.status} />
-                          <span className="font-medium">{doc.name}</span>
+                          <span className="font-medium break-words">{doc.name}</span>
                           {doc.required && (
                             <span className="text-xs text-text-tertiary">
                               Required
                             </span>
                           )}
                         </span>
-                        <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-2 pl-6 sm:pl-0">
                           <Badge
                             variant="secondary"
                             className={cn(
