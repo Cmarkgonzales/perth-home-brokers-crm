@@ -60,12 +60,21 @@ export function formatIdleLabel (days: number): string {
   return `No activity for ${days} days`
 }
 
+function parseCalendarDate (value: string): Date {
+  const dateOnly = value.match(/^(\d{4}-\d{2}-\d{2})/)?.[1]
+  if (dateOnly) return new Date(`${dateOnly}T00:00:00`)
+  return new Date(value)
+}
+
 export function formatDate (date: string): string {
+  const parsed = parseCalendarDate(date)
+  if (Number.isNaN(parsed.getTime())) return date
+
   return new Intl.DateTimeFormat('en-AU', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  }).format(new Date(`${date}T00:00:00`))
+  }).format(parsed)
 }
 
 const SHORT_MONTHS = [
