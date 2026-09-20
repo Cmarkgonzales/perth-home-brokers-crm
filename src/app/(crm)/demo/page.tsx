@@ -27,7 +27,7 @@ const DEMO_STEPS = [
     step: 4,
     title: 'Documents hub',
     description: 'Missing bank statement — AI document check',
-    href: '/documents?deal=PHB-2026-00142',
+    href: '/documents/PHB-2026-00142',
   },
   {
     step: 5,

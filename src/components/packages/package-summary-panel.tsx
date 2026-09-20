@@ -126,7 +126,7 @@ export function PackageSummaryPanel ({
             </p>
           </div>
           <p className="mt-2 text-xs leading-5 text-text-tertiary">
-            Demo estimate only. It assumes a 10% deposit and an illustrative 6.2%
+            It assumes a 10% deposit and an illustrative 6.2%
             rate over 30 years. It isn&apos;t a lending calculation.
           </p>
         </div>

@@ -1,143 +1,138 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
 import type { DocumentsByDeal } from '@/data/demo/helpers'
-import type { Document } from '@/domain/documents/document.types'
-import { DocumentDetailSheet } from '@/components/documents/document-detail-sheet'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  FileText,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  DOCUMENT_STATUS_CLASS,
+  DOCUMENT_STATUS_LABEL,
+} from '@/domain/documents/document.constants'
+import { DocumentProgressBar } from '@/components/documents/document-progress-bar'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface DocumentsHubProps {
   groups: DocumentsByDeal[]
-  initialDealFilter?: string
 }
 
-function DocumentStatusIcon ({ status }: { status: Document['status'] }) {
-  if (status === 'complete') {
-    return <CheckCircle2 className="size-4 text-success" aria-hidden />
-  }
-  if (status === 'missing') {
-    return <AlertCircle className="size-4 text-danger" aria-hidden />
-  }
-  return <Clock className="size-4 text-warning" aria-hidden />
-}
-
-export function DocumentsHub ({ groups, initialDealFilter }: DocumentsHubProps) {
-  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null)
-  const [selectedDealName, setSelectedDealName] = useState('')
-  const [sheetOpen, setSheetOpen] = useState(false)
-
-  const filteredGroups = initialDealFilter
-    ? groups.filter((group) => group.dealId === initialDealFilter)
-    : groups
-
-  function openDocument (doc: Document, dealName: string) {
-    setSelectedDoc(doc)
-    setSelectedDealName(dealName)
-    setSheetOpen(true)
+function AttentionBadges ({ group }: { group: DocumentsByDeal }) {
+  if (group.missingCount === 0 && group.reviewCount === 0) {
+    return (
+      <Badge variant="secondary" className={DOCUMENT_STATUS_CLASS.complete}>
+        Complete
+      </Badge>
+    )
   }
 
   return (
-    <>
-      <div className="space-y-6">
-        {initialDealFilter && (
-          <p className="text-sm text-text-secondary">
-            Showing documents for deal{' '}
-            <span className="font-mono">{initialDealFilter}</span>
-            {' · '}
-            <Link href="/documents" className="text-text-primary hover:underline">
-              View all
+    <div className="flex flex-wrap items-center gap-2">
+      {group.missingCount > 0 ? (
+        <Badge variant="secondary" className={DOCUMENT_STATUS_CLASS.missing}>
+          {group.missingCount} {DOCUMENT_STATUS_LABEL.missing.toLowerCase()}
+        </Badge>
+      ) : null}
+      {group.reviewCount > 0 ? (
+        <Badge variant="secondary" className={DOCUMENT_STATUS_CLASS.review}>
+          {group.reviewCount} {DOCUMENT_STATUS_LABEL.review.toLowerCase()}
+        </Badge>
+      ) : null}
+    </div>
+  )
+}
+
+export function DocumentsHub ({ groups }: DocumentsHubProps) {
+  if (groups.length === 0) {
+    return (
+      <Card className="border-border shadow-none">
+        <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+          No documents recorded yet.
+        </p>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className="gap-0 overflow-hidden py-0">
+      <ul className="divide-y divide-border md:hidden">
+        {groups.map((group) => (
+          <li key={group.dealId}>
+            <Link
+              href={`/documents/${group.dealId}`}
+              className="block p-4 transition-colors hover:bg-table-hover focus-visible:bg-table-hover focus-visible:outline-none"
+            >
+              <p className="font-medium text-text-primary">{group.dealName}</p>
+              <p className="mt-0.5 text-sm text-text-secondary">
+                {group.clientName}
+              </p>
+              <p className="font-mono text-xs text-text-tertiary">{group.dealId}</p>
+              <div className="mt-3 flex items-center gap-3">
+                <DocumentProgressBar
+                  verifiedCount={group.verifiedCount}
+                  requiredCount={group.requiredCount}
+                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-border"
+                />
+                <p className="text-xs tabular-nums text-text-tertiary">
+                  {group.verifiedCount}/{group.requiredCount}
+                </p>
+              </div>
+              <div className="mt-3">
+                <AttentionBadges group={group} />
+              </div>
             </Link>
-          </p>
-        )}
+          </li>
+        ))}
+      </ul>
 
-        {filteredGroups.map((group) => {
-          const required = group.documents.filter((doc) => doc.required)
-          const uploaded = required.filter((doc) => doc.status !== 'missing')
-
-          return (
-            <Card key={group.dealId} className="border-border shadow-none">
-              <CardHeader className="flex flex-col items-start gap-3 pb-2 sm:flex-row sm:justify-between">
-                <div className="min-w-0">
-                  <CardTitle className="text-base font-semibold">
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Deal</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Required</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groups.map((group) => (
+              <TableRow key={group.dealId} className="relative">
+                <TableCell>
+                  <Link
+                    href={`/documents/${group.dealId}`}
+                    className="font-medium text-text-primary after:absolute after:inset-0 hover:text-text-primary"
+                  >
                     {group.dealName}
-                  </CardTitle>
-                  <p className="text-sm text-text-secondary">
-                    {group.clientName} ·{' '}
-                    <Link
-                      href={`/deals/${group.dealId}`}
-                      className="font-mono text-text-tertiary hover:underline"
-                    >
-                      {group.dealId}
-                    </Link>
+                  </Link>
+                  <p className="font-mono text-xs text-text-tertiary">
+                    {group.dealId}
                   </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {group.missingCount > 0 && (
-                    <Badge variant="secondary" className="bg-danger/10 text-danger">
-                      {group.missingCount} missing
-                    </Badge>
-                  )}
-                  <Badge variant="secondary">
-                    {uploaded.length}/{required.length} required
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="divide-y divide-border">
-                  {group.documents.map((doc) => (
-                    <li key={doc.id}>
-                      <button
-                        type="button"
-                        onClick={() => openDocument(doc, group.dealName)}
-                        className="-mx-2 flex w-full flex-col items-start gap-2 rounded-lg px-2 py-3 text-left text-sm transition-colors hover:bg-table-hover sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <span className="inline-flex min-w-0 items-center gap-2">
-                          <DocumentStatusIcon status={doc.status} />
-                          <span className="font-medium break-words">{doc.name}</span>
-                          {doc.required && (
-                            <span className="text-xs text-text-tertiary">
-                              Required
-                            </span>
-                          )}
-                        </span>
-                        <span className="inline-flex items-center gap-2 pl-6 sm:pl-0">
-                          <Badge
-                            variant="secondary"
-                            className={cn(
-                              doc.status === 'missing' && 'bg-danger/10 text-danger',
-                              doc.status === 'review' && 'bg-warning/10 text-warning',
-                              doc.status === 'complete' && 'bg-success/10 text-success'
-                            )}
-                          >
-                            {doc.status}
-                          </Badge>
-                          <FileText className="size-4 text-text-tertiary" aria-hidden />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )
-        })}
+                </TableCell>
+                <TableCell>{group.clientName}</TableCell>
+                <TableCell>
+                  <div className="flex min-w-28 items-center gap-2">
+                    <DocumentProgressBar
+                      verifiedCount={group.verifiedCount}
+                      requiredCount={group.requiredCount}
+                      className="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-border"
+                    />
+                    <span className="text-xs tabular-nums text-text-tertiary">
+                      {group.verifiedCount}/{group.requiredCount}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <AttentionBadges group={group} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
-
-      <DocumentDetailSheet
-        document={selectedDoc}
-        dealName={selectedDealName}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
-    </>
+    </Card>
   )
 }

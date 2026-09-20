@@ -27,12 +27,16 @@ export function ApprovalQueue ({ approvals }: ApprovalQueueProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {approvals.map((approval) => {
         const overdue = isOverdue(approval.dueDate)
 
         return (
-          <Link key={approval.id} href={`/approvals/${approval.id}`}>
+          <Link
+            key={approval.id}
+            href={`/approvals/${approval.id}`}
+            className="block rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <Card
               className={cn(
                 'border-border shadow-none transition-colors hover:bg-table-hover',

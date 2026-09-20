@@ -26,7 +26,7 @@ export function ConversionFunnel ({ stages, conversionRate }: ConversionFunnelPr
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-surface-strong">
                 <div
-                  className="h-full rounded-full bg-phb-red"
+                  className="h-full rounded-full bg-phb-yellow-dark"
                   style={{ width: `${(stage.count / maxCount) * 100}%` }}
                 />
               </div>

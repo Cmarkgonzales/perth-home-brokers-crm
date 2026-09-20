@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { AgentRun } from '@/domain/ai/agent.types'
 import type { AiMessage } from '@/domain/ai/ai.types'
 import {
   completeAgentRun,
-  createBriefingAgentRun,
   createFollowUpAgentRun,
   matchAgentRunType,
 } from '@/domain/ai/mock-agent'
-import { generateResponse, createUserMessage } from '@/domain/ai/mock-copilot'
+import { createUserMessage } from '@/domain/ai/mock-copilot'
 import { AiCopilot } from '@/components/ai/ai-copilot'
-import { AgentTrace } from '@/components/ai/agent-trace'
 import { AgentApprovalGate } from '@/components/ai/agent-approval-gate'
+
+const FOLLOW_UP_APPROVAL_DELAY_MS = 700
 
 export function AiCopilotWithAgents ({
   initialPrompt,
@@ -24,31 +24,29 @@ export function AiCopilotWithAgents ({
   const [extraMessages, setExtraMessages] = useState<AiMessage[]>([])
 
   function handleAgentPrompt (prompt: string) {
-    const runType = matchAgentRunType(prompt)
-    if (runType === 'briefing') {
-      setAgentRun(createBriefingAgentRun())
+    if (matchAgentRunType(prompt) === 'followup') {
       setShowApproval(false)
-    } else if (runType === 'followup') {
       setAgentRun(createFollowUpAgentRun())
-      setShowApproval(false)
-    } else {
-      setAgentRun(null)
-      setShowApproval(false)
+      return
     }
+
+    setAgentRun(null)
+    setShowApproval(false)
   }
 
-  function handleAgentComplete (run: AgentRun) {
-    setAgentRun(run)
-    if (run.status === 'complete') {
-      const response = generateResponse(run.trigger)
-      setExtraMessages((prev) => [...prev, response])
-    }
-  }
+  useEffect(() => {
+    if (!agentRun || showApproval) return
+    if (agentRun.status !== 'running' || !agentRun.pendingApproval) return
 
-  function handleAwaitingApproval (run: AgentRun) {
-    setAgentRun(run)
-    setShowApproval(true)
-  }
+    const timeoutId = window.setTimeout(() => {
+      setAgentRun((current) =>
+        current ? { ...current, status: 'awaiting_approval' } : current
+      )
+      setShowApproval(true)
+    }, FOLLOW_UP_APPROVAL_DELAY_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [agentRun, showApproval])
 
   function handleApprove () {
     if (!agentRun) return
@@ -72,16 +70,7 @@ export function AiCopilotWithAgents ({
   }
 
   return (
-    <div className="space-y-4">
-      {agentRun && agentRun.status !== 'complete' && !showApproval && (
-        <AgentTrace
-          key={agentRun.id}
-          run={agentRun}
-          onComplete={handleAgentComplete}
-          onAwaitingApproval={handleAwaitingApproval}
-        />
-      )}
-
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       {showApproval && agentRun?.pendingApproval && (
         <AgentApprovalGate
           approval={agentRun.pendingApproval}

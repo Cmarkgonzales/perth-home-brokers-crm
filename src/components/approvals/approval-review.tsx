@@ -4,6 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Approval, ApprovalStatus } from '@/domain/approvals/approval.types'
 import type { Document } from '@/domain/documents/document.types'
+import {
+  DOCUMENT_STATUS_CLASS,
+  DOCUMENT_STATUS_LABEL,
+} from '@/domain/documents/document.constants'
 import { formatCurrency, formatDate } from '@/lib/formatting'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -56,43 +60,35 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link
-          href="/approvals"
-          className="mb-2 inline-block text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Back to approvals
-        </Link>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
-              {approval.title}
-            </h1>
-            <p className="text-sm text-text-secondary">
-              {approval.clientName} ·{' '}
-              <Link
-                href={`/deals/${approval.dealId}`}
-                className="font-mono hover:underline"
-              >
-                {approval.dealId}
-              </Link>
-            </p>
-          </div>
-          <Badge
-            variant="secondary"
-            className={
-              status === 'approved'
-                ? 'bg-success/10 text-success'
-                : status === 'rejected'
-                  ? 'bg-danger/10 text-danger'
-                  : status === 'changes_requested'
-                    ? 'bg-warning/10 text-warning'
-                    : 'bg-info/10 text-info'
-            }
-          >
-            {statusLabels[status]}
-          </Badge>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
+            {approval.title}
+          </h1>
+          <p className="text-sm text-text-secondary">
+            {approval.clientName} ·{' '}
+            <Link
+              href={`/deals/${approval.dealId}`}
+              className="font-mono hover:underline"
+            >
+              {approval.dealId}
+            </Link>
+          </p>
         </div>
+        <Badge
+          variant="secondary"
+          className={
+            status === 'approved'
+              ? 'bg-success/10 text-success'
+              : status === 'rejected'
+                ? 'bg-danger/10 text-danger'
+                : status === 'changes_requested'
+                  ? 'bg-warning/10 text-warning'
+                  : 'bg-info/10 text-info'
+          }
+        >
+          {statusLabels[status]}
+        </Badge>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -147,15 +143,9 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
                     </span>
                     <Badge
                       variant="secondary"
-                      className={
-                        doc.status === 'missing'
-                          ? 'bg-danger/10 text-danger'
-                          : doc.status === 'review'
-                            ? 'bg-warning/10 text-warning'
-                            : 'bg-success/10 text-success'
-                      }
+                      className={DOCUMENT_STATUS_CLASS[doc.status]}
                     >
-                      {doc.status}
+                      {DOCUMENT_STATUS_LABEL[doc.status]}
                     </Badge>
                   </li>
                 ))}
@@ -211,8 +201,7 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
               {confirmAction === 'rejected' && 'Reject request'}
             </DialogTitle>
             <DialogDescription>
-              This action is UI-only and will not persist. Confirm to update the
-              demo state for this session.
+              Confirm to approve, request changes, or reject the request.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -11,6 +11,7 @@ import { AiMessage as AiMessageComponent } from '@/components/ai/ai-message'
 import { AiSuggestionChips } from '@/components/ai/ai-suggestion-chips'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 import { Sparkles, Send } from 'lucide-react'
 
 interface AiCopilotProps {
@@ -18,6 +19,7 @@ interface AiCopilotProps {
   appendedMessages?: AiMessage[]
   initialPrompt?: string
   onAgentPrompt?: (prompt: string) => void
+  className?: string
 }
 
 export function AiCopilot ({
@@ -25,6 +27,7 @@ export function AiCopilot ({
   appendedMessages = [],
   initialPrompt,
   onAgentPrompt,
+  className,
 }: AiCopilotProps) {
   const [messages, setMessages] = useState<AiMessage[]>(initialMessages)
   const [input, setInput] = useState('')
@@ -85,7 +88,12 @@ export function AiCopilot ({
   }, [initialPrompt]) // eslint-disable-line react-hooks/exhaustive-deps -- send dashboard CTA prompt once
 
   return (
-    <div className="flex h-[calc(100svh-14rem)] min-h-[24rem] flex-col rounded-xl border border-border bg-surface sm:min-h-[480px] lg:h-[calc(100vh-12rem)]">
+    <div
+      className={cn(
+        'flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-surface',
+        className
+      )}
+    >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-border px-4 py-3">
         <Sparkles className="size-4 text-phb-yellow-dark" aria-hidden />
         <span className="text-sm font-semibold text-text-primary">PHB AI Copilot</span>
@@ -95,8 +103,7 @@ export function AiCopilot ({
         {displayMessages.length === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-text-secondary">
-              Ask about your pipeline, deals, documents, or next actions. AI responses
-              use demo CRM context — no live model connected.
+              Ask about your pipeline, deals, documents, or next actions.
             </p>
             <AiSuggestionChips
               suggestions={AI_SUGGESTIONS}
@@ -133,9 +140,22 @@ export function AiCopilot ({
           <Textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key !== 'Enter' ||
+                event.shiftKey ||
+                event.nativeEvent.isComposing
+              ) {
+                return
+              }
+
+              event.preventDefault()
+              handleSubmit(input)
+            }}
             placeholder="Ask about your business…"
             rows={2}
             className="min-h-[60px] resize-none"
+            aria-keyshortcuts="Enter"
           />
           <Button
             type="submit"

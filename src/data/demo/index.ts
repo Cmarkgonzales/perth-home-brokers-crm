@@ -12,6 +12,7 @@ export {
   demoCommissions,
   getCommissionByDealId,
   getCommissionSummary,
+  summariseCommissions,
 } from '@/data/demo/commissions'
 export {
   demoLandLots,
@@ -35,10 +36,12 @@ export {
   getOpenTasks,
   getApprovalById,
   getPendingApprovals,
+  getPendingApprovalCount,
   getApprovalsByDealId,
   getPackageConfigForDeal,
   getCommunicationsByClientId,
   getDocumentsGroupedByDeal,
+  getDealDocumentsDetail,
   getPipelineCounts,
   getActiveDealsCount,
   getNewLeadsCount,
@@ -62,6 +65,7 @@ export type {
   AttentionItem,
   PipelineStageCount,
   DocumentsByDeal,
+  DealDocumentsPageData,
   DealBoardFlag,
   DealBoardFlagTone,
   DealBoardCard,

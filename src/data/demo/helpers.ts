@@ -9,6 +9,8 @@ import {
   isDashboardPipelineGroupId,
   type DashboardPipelineGroupId,
 } from '@/domain/deals/pipeline-groups'
+import type { Document } from '@/domain/documents/document.types'
+import { getRequiredDocumentProgress } from '@/domain/documents/document-utils'
 import type { LeadStatus } from '@/domain/leads/lead.types'
 import { searchCrm } from '@/domain/search/search-crm'
 import { demoActivities } from '@/data/demo/activities'
@@ -41,8 +43,17 @@ export interface DocumentsByDeal {
   dealId: string
   dealName: string
   clientName: string
-  documents: typeof demoDocuments
+  documents: Document[]
+  requiredCount: number
+  verifiedCount: number
+  reviewCount: number
   missingCount: number
+}
+
+export interface DealDocumentsPageData {
+  deal: Deal
+  clientName: string
+  documents: Document[]
 }
 
 export function getClientById (id: string) {
@@ -110,6 +121,10 @@ export function getOverdueApprovals () {
   )
 }
 
+export function getPendingApprovalCount (): number {
+  return getPendingApprovals().length
+}
+
 export function getOverdueApprovalCount (): number {
   return getOverdueApprovals().length
 }
@@ -134,22 +149,54 @@ export function getCommunicationsByClientId (clientId: string) {
     .sort((a, b) => b.date.localeCompare(a.date))
 }
 
+function toDocumentsByDeal (dealId: string): DocumentsByDeal | undefined {
+  const deal = getDealById(dealId)
+  if (!deal) return undefined
+
+  const client = getClientById(deal.clientId)
+  const documents = getDocumentsByDealId(dealId)
+  const progress = getRequiredDocumentProgress(documents)
+
+  return {
+    dealId: deal.id,
+    dealName: deal.name,
+    clientName: client?.name ?? 'Unknown client',
+    documents,
+    requiredCount: progress.requiredCount,
+    verifiedCount: progress.verifiedCount,
+    reviewCount: progress.reviewCount,
+    missingCount: progress.missingCount,
+  }
+}
+
+function documentsAttentionRank (group: DocumentsByDeal): number {
+  if (group.missingCount > 0) return 0
+  if (group.reviewCount > 0) return 1
+  return 2
+}
+
 export function getDocumentsGroupedByDeal (): DocumentsByDeal[] {
   const dealIds = [...new Set(demoDocuments.map((doc) => doc.dealId))]
 
-  return dealIds.map((dealId) => {
-    const deal = getDealById(dealId)
-    const client = deal ? getClientById(deal.clientId) : undefined
-    const documents = getDocumentsByDealId(dealId)
+  return dealIds
+    .map((dealId) => toDocumentsByDeal(dealId))
+    .filter((group): group is DocumentsByDeal => group !== undefined)
+    .sort((a, b) => documentsAttentionRank(a) - documentsAttentionRank(b))
+}
 
-    return {
-      dealId,
-      dealName: deal?.name ?? dealId,
-      clientName: client?.name ?? 'Unknown client',
-      documents,
-      missingCount: documents.filter((doc) => doc.status === 'missing').length,
-    }
-  })
+export function getDealDocumentsDetail (
+  dealId: string
+): DealDocumentsPageData | undefined {
+  const deal = getDealById(dealId)
+  if (!deal) return undefined
+
+  const client = getClientById(deal.clientId)
+
+  return {
+    deal,
+    clientName: client?.name ?? 'Unknown client',
+    documents: getDocumentsByDealId(dealId),
+  }
 }
 
 export function getPipelineCounts (): PipelineStageCount[] {

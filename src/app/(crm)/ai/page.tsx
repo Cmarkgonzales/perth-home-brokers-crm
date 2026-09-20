@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { PageHeader } from '@/components/layout/page-header'
 import { AiCopilotWithAgents } from '@/components/ai/ai-copilot-with-agents'
 
@@ -9,27 +8,11 @@ export default async function AiPage ({
   const initialPrompt = typeof params.q === 'string' ? params.q : undefined
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-        <PageHeader
-          title="AI Copilot"
-          description="Context-aware AI embedded in your Perth Home Brokers workflow. Ask about your deals, clients, and more."
-        />
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/ai/architecture"
-            className="inline-flex h-8 items-center rounded-lg border border-border bg-surface px-2.5 text-sm font-medium hover:bg-surface-muted"
-          >
-            Architecture
-          </Link>
-          <Link
-            href="/ai/activity"
-            className="inline-flex h-8 items-center rounded-lg border border-border bg-surface px-2.5 text-sm font-medium hover:bg-surface-muted"
-          >
-            Activity
-          </Link>
-        </div>
-      </div>
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
+      <PageHeader
+        title="AI Copilot"
+        description="Context-aware AI embedded in your Perth Home Brokers workflow. Ask about your deals, clients, and more."
+      />
       <AiCopilotWithAgents initialPrompt={initialPrompt} />
     </div>
   )

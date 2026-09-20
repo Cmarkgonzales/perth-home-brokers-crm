@@ -88,21 +88,27 @@ export function getCommissionByDealId (dealId: string) {
   return demoCommissions.find((c) => c.dealId === dealId)
 }
 
-export function getCommissionSummary (): CommissionSummary {
-  const pipeline = demoCommissions
-    .filter((c) => c.status === 'pipeline')
-    .reduce((sum, c) => sum + c.consultantAmount, 0)
-  const expected = demoCommissions
-    .filter((c) => c.status === 'expected')
-    .reduce((sum, c) => sum + c.consultantAmount, 0)
-  const paid = demoCommissions
-    .filter((c) => c.status === 'paid')
-    .reduce((sum, c) => sum + c.consultantAmount, 0)
+export function summariseCommissions (
+  commissions: Commission[]
+): CommissionSummary {
+  const pipeline = commissions
+    .filter((commission) => commission.status === 'pipeline')
+    .reduce((sum, commission) => sum + commission.consultantAmount, 0)
+  const expected = commissions
+    .filter((commission) => commission.status === 'expected')
+    .reduce((sum, commission) => sum + commission.consultantAmount, 0)
+  const paid = commissions
+    .filter((commission) => commission.status === 'paid')
+    .reduce((sum, commission) => sum + commission.consultantAmount, 0)
 
   return {
-    period: 'September 2026',
+    period: commissions[0]?.period ?? 'September 2026',
     pipeline,
     expected,
     paid,
   }
+}
+
+export function getCommissionSummary (): CommissionSummary {
+  return summariseCommissions(demoCommissions)
 }

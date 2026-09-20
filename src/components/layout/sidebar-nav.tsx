@@ -19,22 +19,36 @@ function isActiveRoute (pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
+function NavCountBadge ({ count }: { count: number }) {
+  return (
+    <span
+      aria-hidden
+      className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-danger text-[11px] font-medium tabular-nums text-white"
+    >
+      {count}
+    </span>
+  )
+}
+
 function NavLink ({
   href,
   label,
   icon: Icon,
   isActive,
   badge,
+  ariaLabel,
 }: {
   href: string
   label: string
   icon: LucideIcon
   isActive: boolean
   badge?: React.ReactNode
+  ariaLabel?: string
 }) {
   return (
     <Link
       href={href}
+      aria-label={ariaLabel}
       className={cn(
         'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors lg:py-2',
         isActive
@@ -48,7 +62,7 @@ function NavLink ({
           isActive ? 'text-text-primary' : 'text-sidebar-muted'
         )}
       />
-      {label}
+      <span className="min-w-0 flex-1 truncate">{label}</span>
       {badge}
     </Link>
   )
@@ -67,7 +81,11 @@ export function SidebarBrand ({ className }: { className?: string }) {
   )
 }
 
-export function SidebarNav () {
+export function SidebarNav ({
+  pendingApprovalCount = 0,
+}: {
+  pendingApprovalCount?: number
+}) {
   const pathname = usePathname()
   const SettingsIcon = SETTINGS_NAV_ITEM.icon
   const AiIcon = AI_NAV_ITEM.icon
@@ -87,15 +105,30 @@ export function SidebarNav () {
                 {section.label}
               </h2>
               <div className="flex flex-col gap-0.5">
-                {section.items.map((item) => (
-                  <NavLink
-                    key={item.href}
-                    href={item.href}
-                    label={item.label}
-                    icon={item.icon}
-                    isActive={isActiveRoute(pathname, item.href)}
-                  />
-                ))}
+                {section.items.map((item) => {
+                  const showPendingBadge =
+                    item.href === '/approvals' && pendingApprovalCount > 0
+
+                  return (
+                    <NavLink
+                      key={item.href}
+                      href={item.href}
+                      label={item.label}
+                      icon={item.icon}
+                      isActive={isActiveRoute(pathname, item.href)}
+                      ariaLabel={
+                        showPendingBadge
+                          ? `${item.label}, ${pendingApprovalCount} pending`
+                          : undefined
+                      }
+                      badge={
+                        showPendingBadge ? (
+                          <NavCountBadge count={pendingApprovalCount} />
+                        ) : undefined
+                      }
+                    />
+                  )
+                })}
               </div>
             </section>
           )

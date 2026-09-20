@@ -13,7 +13,11 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
-export function MobileNav () {
+interface MobileNavProps {
+  pendingApprovalCount?: number
+}
+
+export function MobileNav ({ pendingApprovalCount }: MobileNavProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [openForPath, setOpenForPath] = useState(pathname)
@@ -45,7 +49,7 @@ export function MobileNav () {
           <SheetTitle>Command Center navigation</SheetTitle>
         </SheetHeader>
         <SidebarBrand className="pr-12" />
-        <SidebarNav />
+        <SidebarNav pendingApprovalCount={pendingApprovalCount} />
       </SheetContent>
     </Sheet>
   )

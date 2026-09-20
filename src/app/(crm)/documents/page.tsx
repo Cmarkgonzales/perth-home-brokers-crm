@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { getDocumentsGroupedByDeal } from '@/data/demo'
 import { PageHeader } from '@/components/layout/page-header'
 import { DocumentsHub } from '@/components/documents/documents-hub'
@@ -7,6 +8,11 @@ export default async function DocumentsPage ({
 }: PageProps<'/documents'>) {
   const { deal } = await searchParams
   const dealFilter = typeof deal === 'string' ? deal : undefined
+
+  if (dealFilter) {
+    redirect(`/documents/${dealFilter}`)
+  }
+
   const groups = getDocumentsGroupedByDeal()
 
   return (
@@ -16,7 +22,7 @@ export default async function DocumentsPage ({
         description="Track required documents across all deals."
       />
 
-      <DocumentsHub groups={groups} initialDealFilter={dealFilter} />
+      <DocumentsHub groups={groups} />
     </div>
   )
 }

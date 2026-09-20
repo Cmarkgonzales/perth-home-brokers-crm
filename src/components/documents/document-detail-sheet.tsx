@@ -2,6 +2,10 @@
 
 import { useState } from 'react'
 import type { Document } from '@/domain/documents/document.types'
+import {
+  DOCUMENT_STATUS_CLASS,
+  DOCUMENT_STATUS_LABEL,
+} from '@/domain/documents/document.constants'
 import type { AgentRun } from '@/domain/ai/agent.types'
 import { createDocumentAgentRun } from '@/domain/ai/mock-agent'
 import { formatDate } from '@/lib/formatting'
@@ -24,12 +28,6 @@ interface DocumentDetailSheetProps {
   dealName: string
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function statusClass (status: Document['status']) {
-  if (status === 'missing') return 'bg-danger/10 text-danger'
-  if (status === 'review') return 'bg-warning/10 text-warning'
-  return 'bg-success/10 text-success'
 }
 
 export function DocumentDetailSheet ({
@@ -59,8 +57,11 @@ export function DocumentDetailSheet ({
         <div className="space-y-4 px-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-text-secondary">Status</span>
-            <Badge variant="secondary" className={statusClass(document.status)}>
-              {document.status}
+            <Badge
+              variant="secondary"
+              className={DOCUMENT_STATUS_CLASS[document.status]}
+            >
+              {DOCUMENT_STATUS_LABEL[document.status]}
             </Badge>
           </div>
           <div className="flex items-center justify-between text-sm">

@@ -16,12 +16,16 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 
-export function Topbar () {
+interface TopbarProps {
+  pendingApprovalCount?: number
+}
+
+export function Topbar ({ pendingApprovalCount }: TopbarProps) {
   const [searchOpen, setSearchOpen] = useState(false)
 
   return (
     <header className="flex h-full min-w-0 flex-1 items-center gap-2 bg-surface px-3 sm:gap-4 sm:px-4 lg:px-6">
-      <MobileNav />
+      <MobileNav pendingApprovalCount={pendingApprovalCount} />
 
       <Link
         href="/dashboard"

@@ -1,3 +1,5 @@
+import type { NotificationPreferenceKey } from '@/domain/settings/notification-preferences'
+
 export type NotificationKind = 'alert' | 'ai'
 
 export interface AppNotification {
@@ -6,6 +8,7 @@ export interface AppNotification {
   href: string
   kind: NotificationKind
   read: boolean
+  preferenceKey: NotificationPreferenceKey
 }
 
 export const demoNotifications: AppNotification[] = [
@@ -15,13 +18,15 @@ export const demoNotifications: AppNotification[] = [
     href: '/approvals/appr-002',
     kind: 'alert',
     read: false,
+    preferenceKey: 'overdueApprovals',
   },
   {
     id: 'notif-002',
     title: "AI flagged James Williams's payslip for review",
-    href: '/documents?deal=PHB-2026-00142',
+    href: '/documents/PHB-2026-00142',
     kind: 'ai',
     read: false,
+    preferenceKey: 'documentsReceived',
   },
   {
     id: 'notif-003',
@@ -29,5 +34,6 @@ export const demoNotifications: AppNotification[] = [
     href: '/ai',
     kind: 'ai',
     read: false,
+    preferenceKey: 'morningBriefing',
   },
 ]

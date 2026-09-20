@@ -1,22 +1,11 @@
 import type { Commission } from '@/domain/commissions/commission.types'
 import { formatCurrency } from '@/lib/formatting'
-import { Badge } from '@/components/ui/badge'
+import { CommissionStatusBadge } from '@/components/commissions/commission-status-badge'
 import { ButtonLink } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 
 interface DealCommissionCardProps {
   commission: Commission
-}
-
-const STATUS_CLASS: Record<Commission['status'], string> = {
-  expected: 'bg-info/10 text-info',
-  pipeline: 'bg-surface-strong text-text-secondary',
-  paid: 'bg-success/10 text-success',
-}
-
-function statusLabel (status: Commission['status']): string {
-  return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
 export function DealCommissionCard ({ commission }: DealCommissionCardProps) {
@@ -31,7 +20,7 @@ export function DealCommissionCard ({ commission }: DealCommissionCardProps) {
         <CardTitle className="text-base font-semibold">Commission</CardTitle>
         <CardAction>
           <ButtonLink
-            href={`/commissions/${commission.dealId}`}
+            href={`/commissions?deal=${commission.dealId}`}
             variant="ghost"
             size="sm"
             className="text-text-secondary"
@@ -61,12 +50,7 @@ export function DealCommissionCard ({ commission }: DealCommissionCardProps) {
           <div className="flex items-center justify-between gap-3">
             <dt className="text-sm text-text-secondary">Status</dt>
             <dd>
-              <Badge
-                variant="secondary"
-                className={cn(STATUS_CLASS[commission.status])}
-              >
-                {statusLabel(commission.status)}
-              </Badge>
+              <CommissionStatusBadge status={commission.status} />
             </dd>
           </div>
         </dl>

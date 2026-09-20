@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Commission } from '@/domain/commissions/commission.types'
 import { formatCurrency } from '@/lib/formatting'
-import { Badge } from '@/components/ui/badge'
+import { CommissionStatusBadge } from '@/components/commissions/commission-status-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -15,22 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { cn } from '@/lib/utils'
 
 interface CommissionDetailProps {
   commission: Commission
-}
-
-const statusStyles: Record<Commission['status'], string> = {
-  pipeline: 'bg-surface-strong text-text-secondary',
-  expected: 'bg-warning/10 text-warning',
-  paid: 'bg-success/10 text-success',
-}
-
-const statusLabels: Record<Commission['status'], string> = {
-  pipeline: 'Pipeline',
-  expected: 'Expected',
-  paid: 'Paid',
 }
 
 export function CommissionDetail ({ commission }: CommissionDetailProps) {
@@ -44,29 +31,28 @@ export function CommissionDetail ({ commission }: CommissionDetailProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link
-          href="/commissions"
-          className="mb-2 inline-block text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Back to commissions
-        </Link>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
-              {commission.dealName}
-            </h1>
-            <p className="text-sm text-text-secondary">
-              {commission.dealId} · {commission.consultant}
-            </p>
-          </div>
-          <Badge
-            variant="secondary"
-            className={cn('font-normal', statusStyles[status])}
-          >
-            {statusLabels[status]}
-          </Badge>
+      <nav aria-label="Breadcrumb">
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-text-tertiary">
+          <li>
+            <Link href="/commissions" className="hover:text-text-primary">
+              Commissions
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li className="text-text-secondary">{commission.dealName}</li>
+        </ol>
+      </nav>
+
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
+            {commission.dealName}
+          </h1>
+          <p className="text-sm text-text-secondary">
+            {commission.dealId} · {commission.consultant}
+          </p>
         </div>
+        <CommissionStatusBadge status={status} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -130,7 +116,6 @@ export function CommissionDetail ({ commission }: CommissionDetailProps) {
             <DialogTitle>Mark commission as paid?</DialogTitle>
             <DialogDescription>
               This will update the commission status for {commission.dealName}.
-              Demo action only — no persistence.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

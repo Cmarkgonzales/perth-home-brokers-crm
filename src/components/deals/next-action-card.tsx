@@ -13,7 +13,7 @@ function nextActionCta (deal: Deal): { label: string; href: string } {
   if (action.includes('document')) {
     return {
       label: action.includes('request') ? 'Request document' : 'Review documents',
-      href: `/documents?deal=${deal.id}`,
+      href: `/documents/${deal.id}`,
     }
   }
 

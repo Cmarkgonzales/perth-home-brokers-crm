@@ -51,7 +51,7 @@ export function AgentApprovalGate ({
         </div>
 
         <p className="text-xs text-text-tertiary">
-          Demo only — no message will be sent. Approval records activity in the agent audit trail.
+          Approval records activity in the agent audit trail.
         </p>
       </CardContent>
     </Card>

@@ -15,7 +15,7 @@ export default function ReportsPage () {
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <PageHeader
           title="Reports"
-          description="Pipeline analytics and conversion metrics from demo data."
+          description="Pipeline analytics and conversion metrics."
         />
         <Button variant="outline" size="sm" className="w-fit gap-2">
           <Download className="size-4" aria-hidden />

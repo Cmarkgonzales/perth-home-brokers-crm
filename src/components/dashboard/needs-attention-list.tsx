@@ -30,7 +30,7 @@ export function NeedsAttentionList ({ items }: NeedsAttentionListProps) {
               <li key={item.id}>
                 <Link
                   href={item.href}
-                  className="flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-table-hover focus-visible:bg-table-hover focus-visible:outline-none sm:items-center"
+                  className="relative flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-table-hover focus-visible:bg-table-hover focus-visible:outline-none sm:items-center"
                 >
                   <span
                     className={cn(

@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bell } from 'lucide-react'
 import { demoNotifications } from '@/data/demo/notifications'
+import { useNotificationPreferences } from '@/components/settings/use-notification-preferences'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,12 +56,6 @@ function persistReadIds (ids: string[]) {
   window.dispatchEvent(new Event('phb-notifications-changed'))
 }
 
-export function clearNotificationReadState () {
-  sessionStorage.removeItem(READ_STORAGE_KEY)
-  cachedRaw = undefined
-  window.dispatchEvent(new Event('phb-notifications-changed'))
-}
-
 export function NotificationsMenu () {
   const router = useRouter()
   const storedReadIds = useSyncExternalStore(
@@ -70,10 +65,13 @@ export function NotificationsMenu () {
   )
   const readIds = new Set(storedReadIds)
 
-  const notifications = demoNotifications.map((notification) => ({
-    ...notification,
-    read: notification.read || readIds.has(notification.id),
-  }))
+  const { preferences } = useNotificationPreferences()
+  const notifications = demoNotifications
+    .filter((notification) => preferences[notification.preferenceKey])
+    .map((notification) => ({
+      ...notification,
+      read: notification.read || readIds.has(notification.id),
+    }))
   const unreadCount = notifications.filter((notification) => !notification.read).length
 
   function markAllRead () {
@@ -118,6 +116,11 @@ export function NotificationsMenu () {
           </button>
         </div>
         <DropdownMenuSeparator className="my-0" />
+        {notifications.length === 0 && (
+          <p className="px-3 py-6 text-center text-sm text-text-secondary">
+            No notifications for your current preferences.
+          </p>
+        )}
         {notifications.map((notification) => (
           <DropdownMenuItem
             key={notification.id}

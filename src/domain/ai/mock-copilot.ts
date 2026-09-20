@@ -165,8 +165,7 @@ export function checkDocument (documentId: string): DocumentCheckResult | null {
       status: 'review',
       extractedFields: [
         { label: 'Name', value: 'James Williams' },
-        { label: 'Employer', value: 'ABC Construction Pty Ltd' },
-        { label: 'Pay period', value: 'Feb 2026' },
+        { label: 'Employer', value: 'ABC Construction' },
       ],
       issue:
         'Employer name differs from finance application (ABC Construction vs ABC Construction Group). Needs manual review.',
@@ -285,7 +284,7 @@ export function generateResponse (prompt: string): AiMessage {
       ],
       links: [
         { label: 'Open deal workspace', href: `/deals/${DEMO_DEAL_ID}` },
-        { label: 'View documents', href: '/documents?deal=PHB-2026-00142' },
+        { label: 'View documents', href: `/documents/${DEMO_DEAL_ID}` },
       ],
     },
     leads: {
@@ -364,7 +363,7 @@ export function generateResponse (prompt: string): AiMessage {
       ],
       links: [
         { label: 'Open deal', href: `/deals/${DEMO_DEAL_ID}` },
-        { label: 'View documents', href: '/documents?deal=PHB-2026-00142' },
+        { label: 'View documents', href: `/documents/${DEMO_DEAL_ID}` },
       ],
     },
     default: {
