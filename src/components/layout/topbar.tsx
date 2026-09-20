@@ -1,31 +1,64 @@
-import { Bell, Search } from 'lucide-react'
-import { APP_NAME, CURRENT_USER } from '@/lib/constants'
+'use client'
+
+import { Bell, ChevronDown, Search } from 'lucide-react'
+import { CURRENT_USER } from '@/lib/constants'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 
 export function Topbar () {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-background px-6">
-      <h1 className="text-base font-semibold tracking-tight">{APP_NAME}</h1>
+    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-surface px-6">
+      <div className="relative hidden flex-1 sm:block sm:max-w-md">
+        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search CRM..."
+          className="h-9 bg-app-background pl-8"
+          aria-label="Search CRM"
+        />
+      </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <div className="relative hidden sm:block">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search deals, clients..."
-            className="h-8 w-64 pl-8"
-          />
-        </div>
-
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Bell className="size-4" />
         </Button>
 
-        <Avatar size="sm">
-          <AvatarFallback>{CURRENT_USER.initials}</AvatarFallback>
-        </Avatar>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="flex items-center gap-2 rounded-lg px-2 py-1 outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="User menu"
+          >
+            <Avatar size="sm">
+              <AvatarFallback>{CURRENT_USER.initials}</AvatarFallback>
+            </Avatar>
+            <span className="hidden text-sm font-medium md:inline">
+              {CURRENT_USER.name}
+            </span>
+            <ChevronDown className="hidden size-4 text-muted-foreground md:inline" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel>
+              <p className="font-medium">{CURRENT_USER.name}</p>
+              <p className="text-xs font-normal text-muted-foreground">
+                {CURRENT_USER.role}
+              </p>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Sign out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )

@@ -1,8 +1,5 @@
-import type { Client } from '@/types/crm'
-import { demoClient } from '@/data/demo'
+import { demoClients, getClientById } from '@/data/demo'
 
-export const clients: Client[] = [demoClient]
+export const clients = demoClients
 
-export function getClientById (id: string): Client | undefined {
-  return clients.find((client) => client.id === id)
-}
+export { getClientById }

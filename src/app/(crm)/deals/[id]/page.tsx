@@ -1,20 +1,17 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getClientById } from '@/data/clients'
-import { getDealById } from '@/data/deals'
-import { demoDocuments } from '@/data/demo'
-import { DEAL_STAGE_LABELS } from '@/lib/constants'
+import {
+  getClientById,
+  getDealById,
+  getDocumentsByDealId,
+  getMissingDocumentsForDeal,
+} from '@/data/demo'
+import { formatCurrency } from '@/lib/formatting'
+import { DealStageBadge } from '@/components/deals/deal-stage-badge'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-
-function formatCurrency (value: number): string {
-  return new Intl.NumberFormat('en-AU', {
-    style: 'currency',
-    currency: 'AUD',
-    maximumFractionDigits: 0,
-  }).format(value)
-}
+import { AlertTriangle } from 'lucide-react'
 
 export default async function DealDetailPage ({
   params,
@@ -27,11 +24,12 @@ export default async function DealDetailPage ({
   }
 
   const client = getClientById(deal.clientId)
-  const documents = demoDocuments.filter((doc) => doc.dealId === deal.id)
+  const documents = getDocumentsByDealId(deal.id)
+  const missingDocuments = getMissingDocumentsForDeal(deal.id)
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Link
             href="/deals"
@@ -39,45 +37,65 @@ export default async function DealDetailPage ({
           >
             ← Back to deals
           </Link>
-          <h2 className="text-2xl font-semibold tracking-tight">{deal.name}</h2>
-          <p className="text-sm text-muted-foreground">{deal.id}</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+              {deal.name}
+            </h1>
+            {deal.atRisk && (
+              <AlertTriangle className="size-5 text-danger" aria-label="At risk" />
+            )}
+          </div>
+          <p className="font-mono text-sm text-text-tertiary">{deal.id}</p>
+          {client && (
+            <Link
+              href={`/clients/${client.id}`}
+              className="mt-1 inline-block text-sm font-medium text-text-primary hover:underline"
+            >
+              {client.name}
+            </Link>
+          )}
         </div>
-        <Badge variant="secondary">{DEAL_STAGE_LABELS[deal.stage]}</Badge>
+        <div className="text-right">
+          <p className="text-[32px] font-semibold tracking-tight text-text-primary">
+            {formatCurrency(deal.value)}
+          </p>
+          <DealStageBadge stage={deal.stage} className="mt-2" />
+        </div>
       </div>
 
+      <Card className="border-border shadow-none">
+        <CardContent className="space-y-2 pt-6">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Deal progress</span>
+            <span>{deal.progress}%</span>
+          </div>
+          <Progress value={deal.progress} className="h-2" />
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="border-border shadow-none">
           <CardHeader>
-            <CardTitle>Deal summary</CardTitle>
+            <CardTitle className="text-base">Next action</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Value</span>
-              <span className="font-medium">{formatCurrency(deal.value)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Owner</span>
-              <span>{deal.owner}</span>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Progress</span>
-                <span>{deal.progress}%</span>
-              </div>
-              <Progress value={deal.progress} className="h-2" />
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Next action</span>
-              <span>{deal.nextActionDue}</span>
-            </div>
-            <p>{deal.nextAction}</p>
+          <CardContent className="space-y-3">
+            <p className="font-medium">{deal.nextAction}</p>
+            <p className="text-sm text-muted-foreground">
+              Due: {deal.nextActionDue} · Owner: {deal.owner}
+            </p>
+            <button
+              type="button"
+              className="inline-flex h-8 items-center rounded-lg bg-phb-yellow px-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-phb-yellow-dark"
+            >
+              Take action
+            </button>
           </CardContent>
         </Card>
 
         {client && (
-          <Card>
+          <Card className="border-border shadow-none">
             <CardHeader>
-              <CardTitle>Client</CardTitle>
+              <CardTitle className="text-base">Client</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p className="font-medium">{client.name}</p>
@@ -90,9 +108,14 @@ export default async function DealDetailPage ({
         )}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Documents</CardTitle>
+      <Card className="border-border shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">Documents checklist</CardTitle>
+          {missingDocuments.length > 0 && (
+            <Badge variant="secondary" className="bg-warning/10 text-warning">
+              {missingDocuments.length} missing
+            </Badge>
+          )}
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
@@ -100,13 +123,27 @@ export default async function DealDetailPage ({
               <li key={doc.id} className="flex items-center justify-between">
                 <span>{doc.name}</span>
                 <Badge
-                  variant={doc.status === 'missing' ? 'destructive' : 'secondary'}
+                  variant="secondary"
+                  className={
+                    doc.status === 'missing'
+                      ? 'bg-danger/10 text-danger'
+                      : doc.status === 'review'
+                        ? 'bg-warning/10 text-warning'
+                        : 'bg-success/10 text-success'
+                  }
                 >
                   {doc.status}
                 </Badge>
               </li>
             ))}
           </ul>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border shadow-none">
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          Full Deal Workspace with stage stepper, timeline, and package summary
+          arrives in Plan 2.
         </CardContent>
       </Card>
     </div>

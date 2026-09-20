@@ -1,36 +1,64 @@
-import { demoDeal } from '@/data/demo'
-import { DEAL_STAGE_LABELS } from '@/lib/constants'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  getActiveDealsCount,
+  getAttentionItems,
+  getAtRiskDealsCount,
+  getNewLeadsCount,
+  getPipelineCounts,
+  getPipelineValue,
+} from '@/data/demo'
+import { CURRENT_USER } from '@/lib/constants'
+import { formatCurrency, getGreeting } from '@/lib/formatting'
+import { MetricCard } from '@/components/dashboard/metric-card'
+import { NeedsAttentionList } from '@/components/dashboard/needs-attention-list'
+import { PipelineBar } from '@/components/dashboard/pipeline-bar'
 
 export default function DashboardPage () {
+  const pipelineStages = getPipelineCounts()
+  const attentionItems = getAttentionItems()
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
-        <p className="text-sm text-muted-foreground">
-          Overview of your pipeline and active deals.
+        <h1 className="text-[32px] font-semibold tracking-tight text-text-primary">
+          Dashboard
+        </h1>
+        <p className="mt-2 text-sm text-text-secondary">
+          {getGreeting()}, {CURRENT_USER.name.split(' ')[0]}. Here&apos;s
+          what&apos;s happening across PHB today.
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Active deal spotlight</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="font-medium">{demoDeal.name}</p>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <span>{demoDeal.id}</span>
-            <Badge variant="secondary">
-              {DEAL_STAGE_LABELS[demoDeal.stage]}
-            </Badge>
-            <span>{demoDeal.progress}% complete</span>
-          </div>
-          <p className="text-sm">
-            Next: {demoDeal.nextAction} — {demoDeal.nextActionDue}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Active deals"
+          value={String(getActiveDealsCount())}
+          hint="Excluding settled deals"
+          accent="brand"
+        />
+        <MetricCard
+          label="New leads"
+          value={String(getNewLeadsCount())}
+          hint="Awaiting first contact"
+          accent="action"
+        />
+        <MetricCard
+          label="At risk"
+          value={String(getAtRiskDealsCount())}
+          hint="Needs immediate attention"
+          accent="danger"
+        />
+        <MetricCard
+          label="Pipeline value"
+          value={formatCurrency(getPipelineValue())}
+          hint="Active deal total"
+          accent="neutral"
+        />
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <PipelineBar stages={pipelineStages} />
+        <NeedsAttentionList items={attentionItems} />
+      </div>
     </div>
   )
 }

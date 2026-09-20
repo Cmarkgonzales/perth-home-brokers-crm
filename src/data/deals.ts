@@ -1,8 +1,5 @@
-import type { Deal } from '@/types/crm'
-import { demoDeal } from '@/data/demo'
+import { demoDeals, filterDealsByStage, getDealById } from '@/data/demo'
 
-export const deals: Deal[] = [demoDeal]
+export const deals = demoDeals
 
-export function getDealById (id: string): Deal | undefined {
-  return deals.find((deal) => deal.id === id)
-}
+export { getDealById, filterDealsByStage }

@@ -1,0 +1,60 @@
+import type { Activity } from '@/domain/activities/activity.types'
+
+export const demoActivities: Activity[] = [
+  {
+    id: 'act-001',
+    dealId: 'PHB-2026-00142',
+    date: '2026-03-18',
+    title: 'Finance pre-approval submitted',
+    description: 'Application sent to preferred lender for review.',
+    type: 'finance',
+  },
+  {
+    id: 'act-002',
+    dealId: 'PHB-2026-00142',
+    date: '2026-03-17',
+    title: 'Payslips uploaded',
+    description: 'Sarah and James payslips received and verified.',
+    type: 'document',
+  },
+  {
+    id: 'act-003',
+    dealId: 'PHB-2026-00142',
+    date: '2026-03-15',
+    title: 'Initial consultation completed',
+    description: 'Budget and location preferences confirmed.',
+    type: 'client',
+  },
+  {
+    id: 'act-004',
+    dealId: 'PHB-2026-00138',
+    date: '2026-03-16',
+    title: 'Builder quote received',
+    description: 'Quote from Summit Homes pending approval review.',
+    type: 'approval',
+  },
+  {
+    id: 'act-005',
+    dealId: 'PHB-2026-00138',
+    date: '2026-03-10',
+    title: 'Package configuration saved',
+    description: 'Baldivis lot + Madison design selected.',
+    type: 'system',
+  },
+  {
+    id: 'act-006',
+    dealId: 'PHB-2026-00151',
+    date: '2026-03-05',
+    title: 'Lead created from open home',
+    description: 'Daniel Smith expressed interest in investment property.',
+    type: 'client',
+  },
+  {
+    id: 'act-007',
+    dealId: 'PHB-2026-00120',
+    date: '2026-03-18',
+    title: 'Settlement date confirmed',
+    description: 'Settlement scheduled for 25 March 2026.',
+    type: 'finance',
+  },
+]

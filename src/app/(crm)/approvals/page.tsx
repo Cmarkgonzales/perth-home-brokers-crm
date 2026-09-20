@@ -1,20 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/layout/page-header'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function ApprovalsPage () {
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Approvals</h2>
-        <p className="text-sm text-muted-foreground">
-          Finance, land, and builder approvals pending review.
-        </p>
-      </div>
+      <PageHeader
+        title="Approvals"
+        description="Finance, land, and builder approvals pending review."
+      />
 
       <Card>
-        <CardHeader>
-          <CardTitle>Coming in Phase 2</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
+        <CardContent className="py-8 text-center text-sm text-text-secondary">
           Approval workflows will be built on top of the Williams Family Home
           demo deal.
         </CardContent>
