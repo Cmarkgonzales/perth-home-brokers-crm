@@ -5,7 +5,9 @@ import { DEAL_STAGES } from '@/domain/deals/deal-stage'
 import {
   DASHBOARD_PIPELINE_GROUPS,
   getPipelineGroupById,
+  groupDealsByPipelineGroup,
   isDashboardPipelineGroupId,
+  type DashboardPipelineGroupId,
 } from '@/domain/deals/pipeline-groups'
 import type { LeadStatus } from '@/domain/leads/lead.types'
 import { searchCrm } from '@/domain/search/search-crm'
@@ -83,9 +85,7 @@ export function getDocumentById (id: string) {
 }
 
 export function getTasksByDealId (dealId: string) {
-  return demoTasks.filter(
-    (task) => task.dealId === dealId && task.status === 'open'
-  )
+  return demoTasks.filter((task) => task.dealId === dealId)
 }
 
 export function getOpenTasks () {
@@ -200,6 +200,69 @@ export function getPipelineGroupCounts (): DashboardPipelineColumn[] {
       0
     ),
     href: `/deals?group=${group.id}`,
+  }))
+}
+
+export type DealBoardFlagTone = 'warning' | 'danger'
+
+export interface DealBoardFlag {
+  label: string
+  tone: DealBoardFlagTone
+}
+
+export interface DealBoardCard {
+  deal: Deal
+  clientName: string
+  ownerInitial: string
+  flag: DealBoardFlag | null
+}
+
+export interface DealBoardColumn {
+  id: DashboardPipelineGroupId
+  label: string
+  deals: DealBoardCard[]
+}
+
+export function getDealBoardFlag (deal: Deal): DealBoardFlag | null {
+  const hasOverdueApproval = getApprovalsByDealId(deal.id).some(
+    (approval) =>
+      approval.status === 'pending' && isDueDateOverdue(approval.dueDate)
+  )
+
+  if (hasOverdueApproval) {
+    return { label: 'Approval overdue', tone: 'warning' }
+  }
+
+  if (getMissingDocumentsForDeal(deal.id).length > 0) {
+    return { label: 'Documents missing', tone: 'warning' }
+  }
+
+  const latestActivity = getLatestActivityDate(deal.id)
+  const idleDays = latestActivity
+    ? daysBetween(latestActivity, DEMO_TODAY)
+    : STALE_ACTIVITY_DAYS + 1
+
+  if (idleDays >= STALE_ACTIVITY_DAYS) {
+    return { label: formatIdleLabel(idleDays), tone: 'warning' }
+  }
+
+  if (deal.atRisk) {
+    return { label: deal.nextAction, tone: 'warning' }
+  }
+
+  return null
+}
+
+export function getDealBoardColumns (deals: Deal[]): DealBoardColumn[] {
+  return groupDealsByPipelineGroup(deals).map((group) => ({
+    id: group.id,
+    label: group.label,
+    deals: group.deals.map((deal) => ({
+      deal,
+      clientName: getClientNameForDeal(deal),
+      ownerInitial: deal.owner.charAt(0).toUpperCase(),
+      flag: getDealBoardFlag(deal),
+    })),
   }))
 }
 

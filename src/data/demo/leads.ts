@@ -49,10 +49,11 @@ export const demoLeads: Lead[] = [
     name: "Liam O'Brien",
     source: 'Website enquiry',
     budget: 590000,
-    status: 'New',
+    status: 'Converted',
     owner: 'James',
     email: 'liam.obrien@example.com',
     phone: '0444 567 890',
+    clientId: 'client-005',
   },
   {
     id: 'lead-006',

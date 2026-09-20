@@ -3,7 +3,8 @@
 import type { HouseDesign } from '@/domain/packages/package.types'
 import { formatCurrency } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
-import { Home } from 'lucide-react'
+import { Check, Home } from 'lucide-react'
+import { SelectedBadge } from '@/components/packages/selected-badge'
 
 interface BuilderSelectorProps {
   designs: HouseDesign[]
@@ -25,7 +26,55 @@ export function BuilderSelector ({
           <button
             key={design.id}
             type="button"
+            aria-pressed={selected}
             onClick={() => onSelect(design.id)}
+            className={cn(
+              'relative rounded-xl border p-4 text-left transition-colors',
+              selected
+                ? 'border-phb-yellow bg-[#FFFCF0] ring-1 ring-phb-yellow/50'
+                : 'border-border bg-surface hover:bg-surface-muted'
+            )}
+          >
+            {selected ? <SelectedBadge /> : null}
+            <div className="mb-3 flex h-[88px] items-center justify-center rounded-lg bg-surface-muted">
+              <Home className="size-8 text-phb-red" aria-hidden />
+            </div>
+            <p className="font-semibold text-text-primary">{design.name}</p>
+            <p className="mt-1 text-xs text-text-tertiary">
+              {design.bedrooms} Bed · {design.bathrooms} Bath · {design.cars} Car
+            </p>
+            <p className="mt-2 font-semibold tabular-nums text-text-primary">
+              From {formatCurrency(design.price)}
+            </p>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+interface BuilderPickerProps {
+  builders: string[]
+  selectedBuilder: string
+  onSelect: (builder: string) => void
+}
+
+export function BuilderPicker ({
+  builders,
+  selectedBuilder,
+  onSelect,
+}: BuilderPickerProps) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {builders.map((builder) => {
+        const selected = builder === selectedBuilder
+
+        return (
+          <button
+            key={builder}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onSelect(builder)}
             className={cn(
               'rounded-xl border p-4 text-left transition-colors',
               selected
@@ -33,16 +82,17 @@ export function BuilderSelector ({
                 : 'border-border bg-surface hover:bg-surface-muted'
             )}
           >
-            <div className="mb-3 flex size-12 items-center justify-center rounded-lg bg-surface-strong">
-              <Home className="size-6 text-phb-red" aria-hidden />
+            <div className="flex items-start justify-between gap-3">
+              <p className="font-semibold text-text-primary">{builder}</p>
+              {selected ? (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-phb-yellow px-2 py-0.5 text-xs font-medium text-text-primary">
+                  <Check className="size-3" aria-hidden />
+                  Selected
+                </span>
+              ) : null}
             </div>
-            <p className="font-semibold text-text-primary">{design.name}</p>
-            <p className="text-sm text-text-secondary">{design.builder}</p>
-            <p className="mt-1 text-xs text-text-tertiary">
-              {design.bedrooms} bed · {design.bathrooms} bath · {design.cars} car
-            </p>
-            <p className="mt-2 font-semibold text-text-primary">
-              {formatCurrency(design.price)}
+            <p className="mt-1 text-sm text-text-secondary">
+              Trusted builder network
             </p>
           </button>
         )

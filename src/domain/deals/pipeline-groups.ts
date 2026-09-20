@@ -50,3 +50,14 @@ export function getPipelineGroupForStage (
   }
   return group
 }
+
+export function groupDealsByPipelineGroup<T extends { stage: DealStage }> (
+  deals: T[]
+): Array<DashboardPipelineGroup & { deals: T[] }> {
+  return DASHBOARD_PIPELINE_GROUPS.map((group) => ({
+    ...group,
+    deals: deals.filter((deal) =>
+      (group.stages as readonly DealStage[]).includes(deal.stage)
+    ),
+  }))
+}

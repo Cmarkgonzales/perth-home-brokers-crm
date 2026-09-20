@@ -35,31 +35,31 @@ export function ClientsTable ({ clients }: ClientsTableProps) {
           const { dealCount, activeDeal } = getClientDealSummary(client.id)
 
           return (
-            <li key={client.id} className="p-4">
+            <li key={client.id}>
               <Link
                 href={`/clients/${client.id}`}
-                className="font-medium text-text-primary hover:underline"
+                className="block p-4 transition-colors hover:bg-table-hover focus-visible:bg-table-hover focus-visible:outline-none"
               >
-                {client.name}
+                <p className="font-medium text-text-primary">{client.name}</p>
+                <p className="text-xs text-text-tertiary">{client.email}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary">{client.type}</Badge>
+                  <span className="text-sm text-text-secondary">{client.location}</span>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                  <span className="text-text-tertiary">
+                    {dealCount} {dealCount === 1 ? 'deal' : 'deals'}
+                  </span>
+                  {activeDeal ? (
+                    <DealStageBadge stage={activeDeal.stage} />
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                  <span className="text-text-secondary">
+                    {activeDeal?.owner ?? '—'}
+                  </span>
+                </div>
               </Link>
-              <p className="text-xs text-text-tertiary">{client.email}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">{client.type}</Badge>
-                <span className="text-sm text-text-secondary">{client.location}</span>
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-                <span className="text-text-tertiary">
-                  {dealCount} {dealCount === 1 ? 'deal' : 'deals'}
-                </span>
-                {activeDeal ? (
-                  <DealStageBadge stage={activeDeal.stage} />
-                ) : (
-                  <span className="text-muted-foreground">—</span>
-                )}
-                <span className="text-text-secondary">
-                  {activeDeal?.owner ?? '—'}
-                </span>
-              </div>
             </li>
           )
         })}
@@ -82,11 +82,11 @@ export function ClientsTable ({ clients }: ClientsTableProps) {
               const { dealCount, activeDeal } = getClientDealSummary(client.id)
 
               return (
-                <TableRow key={client.id}>
+                <TableRow key={client.id} className="relative">
                   <TableCell>
                     <Link
                       href={`/clients/${client.id}`}
-                      className="font-medium text-text-primary hover:underline"
+                      className="font-medium text-text-primary after:absolute after:inset-0 hover:text-text-primary"
                     >
                       {client.name}
                     </Link>

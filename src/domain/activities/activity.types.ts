@@ -21,5 +21,6 @@ export interface Activity {
   description: string
   type: ActivityType
   category: TimelineFilter
+  actor?: string
   isToday?: boolean
 }

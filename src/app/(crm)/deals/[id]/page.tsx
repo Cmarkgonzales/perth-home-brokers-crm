@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
 import {
   getClientById,
+  getCommissionByDealId,
   getDealById,
   getDocumentsByDealId,
   getActivitiesByDealId,
   getTasksByDealId,
   getPackageConfigForDeal,
-  getMissingDocumentsForDeal,
 } from '@/data/demo'
 import { DealWorkspace } from '@/components/deals/deal-workspace'
 
@@ -25,7 +25,7 @@ export default async function DealDetailPage ({
   const activities = getActivitiesByDealId(deal.id)
   const tasks = getTasksByDealId(deal.id)
   const packageConfig = getPackageConfigForDeal(deal.id)
-  const missingDocuments = getMissingDocumentsForDeal(deal.id)
+  const commission = getCommissionByDealId(deal.id)
 
   return (
     <DealWorkspace
@@ -35,7 +35,7 @@ export default async function DealDetailPage ({
       activities={activities}
       tasks={tasks}
       packageConfig={packageConfig}
-      missingCount={missingDocuments.length}
+      commission={commission}
     />
   )
 }

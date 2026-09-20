@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,16 +20,15 @@ export function NewLeadDialog () {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={<Button variant="brand" />}
-      >
-        + New Lead
+      <DialogTrigger render={<Button variant="brand" />}>
+        <Plus className="size-4" aria-hidden />
+        New Lead
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create new lead</DialogTitle>
           <DialogDescription>
-            Capture a new enquiry. This prototype does not persist data.
+            Capture a new enquiry.
           </DialogDescription>
         </DialogHeader>
         <form

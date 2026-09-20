@@ -194,7 +194,7 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
             <span className="font-medium text-text-primary">
               {statusLabels[status]}
             </span>
-            . Actions are UI-only in this prototype.
+            .
           </CardContent>
         </Card>
       )}

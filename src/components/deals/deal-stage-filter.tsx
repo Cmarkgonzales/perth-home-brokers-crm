@@ -1,27 +1,26 @@
-'use client'
-
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import type { DealStage } from '@/domain/deals/deal.types'
 import { DEAL_STAGE_LABELS } from '@/lib/constants'
+import type { DealsQuery } from '@/lib/deals-href'
+import { buildDealsHref } from '@/lib/deals-href'
 import { cn } from '@/lib/utils'
 
 interface DealStageFilterProps {
-  currentStage?: DealStage
+  query: DealsQuery
 }
 
 const filterLinkClass =
   'inline-flex h-7 shrink-0 items-center rounded-lg border px-2.5 text-[0.8rem] font-medium transition-colors'
 
-export function DealStageFilter ({ currentStage }: DealStageFilterProps) {
-  const pathname = usePathname()
+export function DealStageFilter ({ query }: DealStageFilterProps) {
   const stages = Object.keys(DEAL_STAGE_LABELS) as DealStage[]
+  const currentStage = query.stage
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
       <div className="flex w-max flex-nowrap gap-2 sm:w-auto sm:flex-wrap">
         <Link
-          href={pathname}
+          href={buildDealsHref({ ...query, stage: undefined })}
           className={cn(
             filterLinkClass,
             currentStage
@@ -34,7 +33,7 @@ export function DealStageFilter ({ currentStage }: DealStageFilterProps) {
         {stages.map((stage) => (
           <Link
             key={stage}
-            href={`${pathname}?stage=${stage}`}
+            href={buildDealsHref({ ...query, stage, group: undefined })}
             className={cn(
               filterLinkClass,
               currentStage === stage

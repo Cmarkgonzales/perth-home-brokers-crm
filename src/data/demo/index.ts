@@ -46,6 +46,8 @@ export {
   getPipelineValue,
   getAttentionItems,
   getPipelineGroupCounts,
+  getDealBoardFlag,
+  getDealBoardColumns,
   getOverdueApprovalCount,
   getMissingRequiredDocumentCount,
   filterDealsByStage,
@@ -60,4 +62,8 @@ export type {
   AttentionItem,
   PipelineStageCount,
   DocumentsByDeal,
+  DealBoardFlag,
+  DealBoardFlagTone,
+  DealBoardCard,
+  DealBoardColumn,
 } from '@/data/demo/helpers'

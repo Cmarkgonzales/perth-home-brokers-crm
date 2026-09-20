@@ -4,8 +4,11 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { Lead } from '@/domain/leads/lead.types'
 import { formatCurrency } from '@/lib/formatting'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
+import {
+  AiLeadAssessment,
+  AiQualificationButton,
+} from '@/components/ai/ai-lead-assessment'
+import { LeadStatusBadge } from '@/components/leads/lead-status-badge'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
@@ -22,23 +25,9 @@ interface LeadsTableProps {
   leads: Lead[]
 }
 
-function getStatusVariant (status: Lead['status']) {
-  switch (status) {
-    case 'Converted':
-      return 'bg-success/10 text-success'
-    case 'Qualified':
-      return 'bg-info/10 text-info'
-    case 'New':
-      return 'bg-surface-strong text-text-secondary'
-    case 'Contacted':
-      return 'bg-warning/10 text-warning'
-    default:
-      return ''
-  }
-}
-
 export function LeadsTable ({ leads }: LeadsTableProps) {
   const [query, setQuery] = useState('')
+  const [assessmentLead, setAssessmentLead] = useState<Lead | null>(null)
 
   const filteredLeads = useMemo(() => {
     const normalized = query.trim().toLowerCase()
@@ -68,71 +57,100 @@ export function LeadsTable ({ leads }: LeadsTableProps) {
       </div>
 
       <Card className="overflow-hidden gap-0 py-0">
-        <ul className="divide-y divide-border md:hidden">
-          {filteredLeads.map((lead) => (
-            <li key={lead.id} className="p-4">
-              <Link
-                href={`/leads/${lead.id}`}
-                className="font-medium text-text-primary hover:underline"
-              >
-                {lead.name}
-              </Link>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
-                <span>{lead.source}</span>
-                <span aria-hidden>·</span>
-                <span className="tabular-nums">{formatCurrency(lead.budget)}</span>
-                <span aria-hidden>·</span>
-                <span>{lead.owner}</span>
-              </div>
-              <Badge
-                variant="secondary"
-                className={cn('mt-3', getStatusVariant(lead.status))}
-              >
-                {lead.status}
-              </Badge>
-            </li>
-          ))}
-        </ul>
-
-        <div className="hidden md:block">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Budget</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Owner</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        {filteredLeads.length === 0 ? (
+          <p
+            className="px-4 py-8 text-center text-sm text-muted-foreground"
+            role="status"
+          >
+            {query.trim()
+              ? `No leads match “${query.trim()}”.`
+              : 'No leads to display.'}
+          </p>
+        ) : (
+          <>
+            <ul className="divide-y divide-border md:hidden">
               {filteredLeads.map((lead) => (
-                <TableRow key={lead.id}>
-                  <TableCell>
-                    <Link
-                      href={`/leads/${lead.id}`}
-                      className="font-medium text-text-primary hover:underline"
-                    >
-                      {lead.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{lead.source}</TableCell>
-                  <TableCell>{formatCurrency(lead.budget)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={cn(getStatusVariant(lead.status))}
-                    >
-                      {lead.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{lead.owner}</TableCell>
-                </TableRow>
+                <li key={lead.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/leads/${lead.id}`}
+                        className="font-medium text-text-primary hover:underline"
+                      >
+                        {lead.name}
+                      </Link>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+                        <span>{lead.source}</span>
+                        <span aria-hidden>·</span>
+                        <span className="tabular-nums">{formatCurrency(lead.budget)}</span>
+                        <span aria-hidden>·</span>
+                        <span>{lead.owner}</span>
+                      </div>
+                      <LeadStatusBadge status={lead.status} className="mt-3" />
+                    </div>
+                    <AiQualificationButton
+                      leadName={lead.name}
+                      onClick={() => setAssessmentLead(lead)}
+                    />
+                  </div>
+                </li>
               ))}
-            </TableBody>
-          </Table>
-        </div>
+            </ul>
+
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead>Budget</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Owner</TableHead>
+                    <TableHead>
+                      <span className="sr-only">View AI assessment</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredLeads.map((lead) => (
+                    <TableRow key={lead.id}>
+                      <TableCell>
+                        <Link
+                          href={`/leads/${lead.id}`}
+                          className="font-medium text-text-primary hover:underline"
+                        >
+                          {lead.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{lead.source}</TableCell>
+                      <TableCell>{formatCurrency(lead.budget)}</TableCell>
+                      <TableCell>
+                        <LeadStatusBadge status={lead.status} />
+                      </TableCell>
+                      <TableCell>{lead.owner}</TableCell>
+                      <TableCell className="text-right">
+                        <AiQualificationButton
+                          leadName={lead.name}
+                          onClick={() => setAssessmentLead(lead)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
       </Card>
+
+      <AiLeadAssessment
+        key={assessmentLead?.id ?? 'closed'}
+        lead={assessmentLead}
+        open={assessmentLead !== null}
+        onOpenChange={(open) => {
+          if (!open) setAssessmentLead(null)
+        }}
+      />
     </div>
   )
 }

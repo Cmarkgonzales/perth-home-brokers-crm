@@ -45,4 +45,19 @@ export const demoApprovals: Approval[] = [
     clientName: 'Daniel Smith',
     dealValue: 285000,
   },
+  {
+    id: 'appr-004',
+    dealId: 'PHB-2026-00160',
+    title: 'Builder variation — Foster Residence',
+    type: 'builder',
+    status: 'pending',
+    requestedAt: '2026-03-10',
+    dueDate: '2026-03-17',
+    assignee: 'James',
+    description:
+      'Kitchen upgrade variation is overdue. Construction cannot proceed to lock-up until it is approved.',
+    documentIds: [],
+    clientName: 'Amelia Foster',
+    dealValue: 640000,
+  },
 ]

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Deal } from '@/domain/deals/deal.types'
 import type { DealPackageConfig } from '@/domain/packages/package.types'
+import { getClientById } from '@/data/demo'
 import {
   calculatePackageTotal,
   demoHouseDesigns,
@@ -13,8 +14,12 @@ import {
 } from '@/data/demo/packages'
 import { formatCurrency } from '@/lib/formatting'
 import { LandCard } from '@/components/packages/land-card'
-import { BuilderSelector } from '@/components/packages/builder-selector'
-import { Button, ButtonLink } from '@/components/ui/button'
+import {
+  BuilderPicker,
+  BuilderSelector,
+} from '@/components/packages/builder-selector'
+import { PackageSummaryPanel } from '@/components/packages/package-summary-panel'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -25,6 +30,8 @@ import {
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+
+const BUILDERS = [...new Set(demoHouseDesigns.map((design) => design.builder))]
 
 interface PackageBuilderProps {
   deal: Deal
@@ -48,15 +55,35 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
   const selectedDesign = demoHouseDesigns.find(
     (design) => design.id === selectedDesignId
   )!
+  const selectedBuilder = selectedDesign.builder
+  const visibleDesigns = demoHouseDesigns.filter(
+    (design) => design.builder === selectedBuilder
+  )
   const activeExtras = demoPackageExtras.filter((extra) =>
     selectedExtras.includes(extra.id)
   )
+  const extrasTotal = activeExtras.reduce((sum, extra) => sum + extra.price, 0)
   const total = calculatePackageTotal(
     selectedLand.price,
     selectedDesign.price,
     activeExtras
   )
   const repayment = estimateRepayment(total)
+  const client = getClientById(deal.clientId)
+
+  function selectBuilder (builder: string) {
+    if (selectedBuilder === builder) {
+      return
+    }
+
+    const nextDesign = demoHouseDesigns.find(
+      (design) => design.builder === builder
+    )
+
+    if (nextDesign) {
+      setSelectedDesignId(nextDesign.id)
+    }
+  }
 
   function toggleExtra (extraId: string) {
     setSelectedExtras((current) =>
@@ -68,122 +95,124 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
 
   return (
     <div className="space-y-8">
+      <nav aria-label="Breadcrumb">
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-text-tertiary">
+          <li>
+            <Link href="/packages" className="hover:text-text-primary">
+              Packages
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li className="text-text-secondary">{deal.name}</li>
+        </ol>
+      </nav>
+
       <div>
-        <Link
-          href="/packages"
-          className="mb-2 inline-block text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Back to packages
-        </Link>
         <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[32px]">
           Package Builder
         </h1>
-        <p className="text-sm text-text-secondary">
+        <p className="mt-1 text-sm text-text-secondary">
           {deal.name} · {deal.id}
         </p>
       </div>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-text-primary">Land</h2>
-        <div className="grid gap-3 md:grid-cols-3">
-          {demoLandLots.map((lot) => (
-            <LandCard
-              key={lot.id}
-              lot={lot}
-              selected={lot.id === selectedLandId}
-              onSelect={setSelectedLandId}
-            />
-          ))}
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20.5rem] xl:grid-cols-[minmax(0,1fr)_22.5rem]">
+        <div className="space-y-5">
+          <Card className="border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">Land</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 md:grid-cols-3">
+                {demoLandLots.map((lot) => (
+                  <LandCard
+                    key={lot.id}
+                    lot={lot}
+                    selected={lot.id === selectedLandId}
+                    onSelect={setSelectedLandId}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">Builder</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BuilderPicker
+                builders={BUILDERS}
+                selectedBuilder={selectedBuilder}
+                onSelect={selectBuilder}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">
+                Home design
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BuilderSelector
+                designs={visibleDesigns}
+                selectedId={selectedDesignId}
+                onSelect={setSelectedDesignId}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">Upgrades</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {demoPackageExtras.map((extra) => {
+                  const checked = selectedExtras.includes(extra.id)
+
+                  return (
+                    <button
+                      key={extra.id}
+                      type="button"
+                      aria-pressed={checked}
+                      onClick={() => toggleExtra(extra.id)}
+                      className={cn(
+                        'flex items-center justify-between gap-3 rounded-lg border p-3 text-left text-sm transition-colors',
+                        checked
+                          ? 'border-phb-yellow bg-[#FFFCF0]'
+                          : 'border-border hover:bg-surface-muted'
+                      )}
+                    >
+                      <span>{extra.name}</span>
+                      <span className="font-medium tabular-nums text-text-primary">
+                        +{formatCurrency(extra.price)}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-text-primary">
-          House design
-        </h2>
-        <BuilderSelector
-          designs={demoHouseDesigns}
-          selectedId={selectedDesignId}
-          onSelect={setSelectedDesignId}
-        />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-text-primary">Upgrades</h2>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {demoPackageExtras.map((extra) => {
-            const checked = selectedExtras.includes(extra.id)
-
-            return (
-              <button
-                key={extra.id}
-                type="button"
-                onClick={() => toggleExtra(extra.id)}
-                className={cn(
-                  'flex flex-col gap-1 rounded-lg border p-3 text-left text-sm transition-colors sm:flex-row sm:items-center sm:justify-between',
-                  checked
-                    ? 'border-phb-yellow bg-[#FFFCF0]'
-                    : 'border-border hover:bg-surface-muted'
-                )}
-              >
-                <span>{extra.name}</span>
-                <span className="font-medium tabular-nums">
-                  +{formatCurrency(extra.price)}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </section>
-
-      <Card className="border-border shadow-none">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">
-            Package summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-text-secondary">
-              Land — {selectedLand.suburb}
-            </span>
-            <span>{formatCurrency(selectedLand.price)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-text-secondary">
-              Build — {selectedDesign.name}
-            </span>
-            <span>{formatCurrency(selectedDesign.price)}</span>
-          </div>
-          {activeExtras.map((extra) => (
-            <div key={extra.id} className="flex justify-between">
-              <span className="text-text-secondary">{extra.name}</span>
-              <span>{formatCurrency(extra.price)}</span>
-            </div>
-          ))}
-          <div className="border-t border-border pt-3">
-            <div className="flex justify-between text-lg font-semibold">
-              <span>Total</span>
-              <span>{formatCurrency(total)}</span>
-            </div>
-            <p className="mt-2 text-xs text-text-tertiary">
-              Demo repayment estimate: {formatCurrency(repayment)}/month
-              (90% LVR, 6.2% over 30 years — illustrative only)
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2 pt-2">
-            <Button variant="brand" onClick={() => setSavedDialogOpen(true)}>
-              Save package
-            </Button>
-            <Button variant="outline" onClick={() => setPresentDialogOpen(true)}>
-              Present to client
-            </Button>
-            <ButtonLink href={`/deals/${deal.id}`} variant="outline">
-              Back to deal
-            </ButtonLink>
-          </div>
-        </CardContent>
-      </Card>
+        <aside className="order-first lg:sticky lg:top-8 lg:order-none">
+          <PackageSummaryPanel
+            dealId={deal.id}
+            dealName={deal.name}
+            land={selectedLand}
+            design={selectedDesign}
+            extrasTotal={extrasTotal}
+            total={total}
+            monthlyRepayment={repayment}
+            budget={client?.budget}
+            onSave={() => setSavedDialogOpen(true)}
+            onPresent={() => setPresentDialogOpen(true)}
+          />
+        </aside>
+      </div>
 
       <Dialog open={savedDialogOpen} onOpenChange={setSavedDialogOpen}>
         <DialogContent>

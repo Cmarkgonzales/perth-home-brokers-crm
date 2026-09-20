@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import type { Client } from '@/domain/clients/client.types'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,7 +25,8 @@ export function NewDealDialog ({ clients }: NewDealDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button variant="brand" className="h-9 px-3" />}>
-        + New deal
+        <Plus className="size-4" aria-hidden />
+        New deal
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

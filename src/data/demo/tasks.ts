@@ -4,7 +4,7 @@ export const demoTasks: Task[] = [
   {
     id: 'task-001',
     dealId: 'PHB-2026-00142',
-    title: 'Request bank statement from Williams',
+    title: 'Review finance documents',
     assignee: 'James',
     dueDate: '2026-03-20',
     status: 'open',
@@ -13,10 +13,19 @@ export const demoTasks: Task[] = [
   {
     id: 'task-002',
     dealId: 'PHB-2026-00142',
-    title: 'Follow up with lender on pre-approval',
+    title: 'Chase the lender for a decision date',
     assignee: 'James',
-    dueDate: '2026-03-22',
+    dueDate: '2026-03-21',
     status: 'open',
+    priority: 'medium',
+  },
+  {
+    id: 'task-006',
+    dealId: 'PHB-2026-00142',
+    title: 'Book the pre-approval call',
+    assignee: 'James',
+    dueDate: '2026-03-04',
+    status: 'completed',
     priority: 'medium',
   },
   {

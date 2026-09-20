@@ -36,15 +36,18 @@ export interface AiBriefing {
   }[]
 }
 
+export type LeadFollowUpChannel = 'call' | 'sms' | 'email'
+
 export interface LeadAssessment {
   leadId: string
   leadName: string
-  intent: 'HIGH' | 'MEDIUM' | 'LOW'
+  intent: 'High' | 'Medium' | 'Low'
   estimatedBudget: number
   timeline: string
   financeRisk: 'Low' | 'Medium' | 'High'
   summary: string
   recommendedAction: string
+  recommendedChannel: LeadFollowUpChannel
 }
 
 export interface DocumentCheckResult {
@@ -65,5 +68,6 @@ export interface ApprovalAiSummary {
 export interface DealAiInsight {
   dealId: string
   insight: string
+  suggestedNextStep?: string
   nextActions: string[]
 }

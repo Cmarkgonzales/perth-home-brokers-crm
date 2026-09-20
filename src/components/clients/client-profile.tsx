@@ -6,71 +6,131 @@ import {
   getDealsByClientId,
   getDocumentsByDealId,
 } from '@/data/demo'
-import type { Client } from '@/domain/clients/client.types'
-import { formatCurrency } from '@/lib/formatting'
+import type { Client, ClientContactChannel } from '@/domain/clients/client.types'
+import { formatCurrency, getInitials } from '@/lib/formatting'
 import { ActivityFeed } from '@/components/activities/activity-feed'
+import { ClientDocumentsPanel } from '@/components/clients/client-documents-panel'
 import { CommunicationsLog } from '@/components/clients/communications-log'
 import { DealStageBadge } from '@/components/deals/deal-stage-badge'
-import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, CheckCircle2, Clock } from 'lucide-react'
 
 interface ClientProfileProps {
   client: Client
 }
 
+const PREFERRED_CONTACT_LABELS: Record<ClientContactChannel, string> = {
+  sms: 'SMS',
+  email: 'Email',
+  call: 'Call',
+}
+
+const tabTriggerClass =
+  'h-auto rounded-none px-0 pb-3 text-sm font-medium text-text-secondary hover:text-text-primary data-active:bg-transparent data-active:font-semibold data-active:text-text-primary after:right-0 after:left-0 after:h-[2px] after:bg-phb-yellow group-data-horizontal/tabs:after:bottom-0 group-data-[variant=line]/tabs-list:after:bg-phb-yellow'
+
+function DetailRow ({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-2 first:pt-0 last:pb-0">
+      <dt className="text-sm text-text-secondary">{label}</dt>
+      <dd className="text-right text-sm font-medium text-text-primary">{value}</dd>
+    </div>
+  )
+}
+
 export function ClientProfile ({ client }: ClientProfileProps) {
   const activeDeal = getActiveDealForClient(client.id)
   const clientDeals = getDealsByClientId(client.id)
-  const activities = activeDeal
-    ? getActivitiesByDealId(activeDeal.id)
-    : []
+  const activities = activeDeal ? getActivitiesByDealId(activeDeal.id) : []
   const communications = getCommunicationsByClientId(client.id)
   const dealDocuments = activeDeal
-    ? getDocumentsByDealId(activeDeal.id)
+    ? getDocumentsByDealId(activeDeal.id).filter((doc) => doc.required)
     : []
+  const consultant = activeDeal?.owner
+  const locationLine = [client.type, client.location].join(', ')
+  const subtitle = consultant
+    ? `${locationLine}. Consultant: ${consultant}`
+    : locationLine
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Link
-            href="/clients"
-            className="mb-2 inline-block text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← Back to clients
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight break-words text-text-primary sm:text-[32px]">
-            {client.name}
-          </h1>
-          <p className="text-sm text-text-secondary">{client.type}</p>
+      <nav aria-label="Breadcrumb">
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-text-tertiary">
+          <li>
+            <Link href="/clients" className="hover:text-text-primary">
+              Clients
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li className="text-text-secondary">{client.name}</li>
+        </ol>
+      </nav>
+
+      <Card className="border-border shadow-none">
+        <div className="flex items-center gap-4 px-5 py-4 sm:px-6">
+          <Avatar className="size-12" size="lg">
+            <AvatarFallback className="bg-info/10 text-sm font-semibold text-info">
+              {getInitials(client.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold tracking-tight text-text-primary sm:text-2xl">
+              {client.name}
+            </h1>
+            <p className="mt-0.5 text-sm text-text-secondary">{subtitle}</p>
+          </div>
         </div>
-        <Badge variant="secondary">{client.location}</Badge>
-      </div>
+      </Card>
 
       <Tabs defaultValue="overview">
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
-          <TabsList className="h-auto w-max flex-wrap justify-start sm:w-fit">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="deal">Deal</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
-            <TabsTrigger value="communications">Communications</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+        <div className="-mx-4 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+          <TabsList
+            variant="line"
+            className="h-auto w-max gap-6 bg-transparent p-0"
+          >
+            <TabsTrigger value="overview" className={tabTriggerClass}>
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="deal" className={tabTriggerClass}>
+              Deal
+            </TabsTrigger>
+            <TabsTrigger value="documents" className={tabTriggerClass}>
+              Documents
+            </TabsTrigger>
+            <TabsTrigger value="communications" className={tabTriggerClass}>
+              Communications
+            </TabsTrigger>
+            <TabsTrigger value="activity" className={tabTriggerClass}>
+              Activity
+            </TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="overview" className="mt-6 space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-3">
             <Card className="border-border shadow-none">
               <CardHeader>
                 <CardTitle className="text-base">Contact</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <p>{client.email}</p>
-                <p>{client.phone}</p>
-                <p className="text-muted-foreground">{client.location}</p>
+              <CardContent>
+                <dl>
+                  <DetailRow label="Phone" value={client.phone} />
+                  <DetailRow label="Email" value={client.email} />
+                  {client.preferredContact ? (
+                    <DetailRow
+                      label="Preferred contact"
+                      value={PREFERRED_CONTACT_LABELS[client.preferredContact]}
+                    />
+                  ) : null}
+                </dl>
               </CardContent>
             </Card>
 
@@ -78,153 +138,111 @@ export function ClientProfile ({ client }: ClientProfileProps) {
               <CardHeader>
                 <CardTitle className="text-base">Financial snapshot</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Budget</span>
-                  <span className="font-medium">{formatCurrency(client.budget)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Deposit</span>
-                  <span className="font-medium">{formatCurrency(client.deposit)}</span>
-                </div>
+              <CardContent>
+                <dl>
+                  <DetailRow label="Budget" value={formatCurrency(client.budget)} />
+                  <DetailRow label="Deposit" value={formatCurrency(client.deposit)} />
+                  {client.employment ? (
+                    <DetailRow label="Employment" value={client.employment} />
+                  ) : null}
+                </dl>
               </CardContent>
             </Card>
-          </div>
 
-          {activeDeal && (
-            <Card className="border-border shadow-none">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-base">Active deal</CardTitle>
-                <DealStageBadge stage={activeDeal.stage} />
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap items-start justify-between gap-4">
+            {activeDeal ? (
+              <Card className="border-border shadow-none">
+                <CardHeader className="flex flex-row items-start justify-between gap-3">
+                  <CardTitle className="text-base">Active deal</CardTitle>
+                  <DealStageBadge stage={activeDeal.stage} />
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <p className="font-medium">{activeDeal.name}</p>
-                    <p className="text-sm font-mono text-text-tertiary">{activeDeal.id}</p>
-                    <p className="mt-1 text-lg font-semibold">
+                    <p className="text-sm font-medium text-text-primary">{activeDeal.name}</p>
+                    <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
                       {formatCurrency(activeDeal.value)}
                     </p>
                   </div>
-                  <Link
-                    href={`/deals/${activeDeal.id}`}
-                    className="inline-flex h-8 items-center rounded-lg bg-phb-yellow px-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-phb-yellow-dark"
-                  >
-                    Open deal
-                  </Link>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span>{activeDeal.progress}%</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Progress</span>
+                      <span className="tabular-nums text-text-tertiary">
+                        {activeDeal.progress}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={activeDeal.progress}
+                      className="h-2 [&_[data-slot=progress-indicator]]:bg-phb-yellow [&_[data-slot=progress-track]]:h-2"
+                    />
                   </div>
-                  <Progress value={activeDeal.progress} className="h-2" />
-                </div>
-                <p className="text-sm">
-                  <span className="text-muted-foreground">Next: </span>
-                  {activeDeal.nextAction} — {activeDeal.nextActionDue}
-                </p>
-              </CardContent>
-            </Card>
-          )}
+                  <ButtonLink href={`/deals/${activeDeal.id}`} variant="brand">
+                    Open deal workspace
+                  </ButtonLink>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="border-border shadow-none">
+                <CardHeader>
+                  <CardTitle className="text-base">Active deal</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  No active deal for this client.
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
-          {activities.length > 0 && (
-            <Card className="border-border shadow-none">
-              <CardHeader>
-                <CardTitle className="text-base">Recent activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ActivityFeed activities={activities} limit={5} />
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="deal" className="mt-6">
           <Card className="border-border shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">All deals</CardTitle>
+              <CardTitle className="text-base">Recent timeline</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {clientDeals.map((deal) => (
-                <Link
-                  key={deal.id}
-                  href={`/deals/${deal.id}`}
-                  className="flex flex-col gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-table-hover sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div>
-                    <p className="font-medium">{deal.name}</p>
-                    <p className="text-xs font-mono text-text-tertiary">{deal.id}</p>
-                  </div>
-                  <div className="text-right">
-                    <DealStageBadge stage={deal.stage} />
-                    <p className="mt-1 text-sm font-medium">
-                      {formatCurrency(deal.value)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+            <CardContent>
+              <ActivityFeed activities={activities} limit={4} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="documents" className="mt-6">
-          {dealDocuments.length > 0 ? (
-            <Card className="border-border shadow-none">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-base">Deal documents</CardTitle>
-                {activeDeal && (
-                  <Link
-                    href={`/documents?deal=${activeDeal.id}`}
-                    className="text-sm text-text-secondary hover:underline"
+        <TabsContent value="deal" className="mt-6">
+          {clientDeals.length > 0 ? (
+            <Card className="gap-0 border-border py-0 shadow-none">
+              <ul className="divide-y divide-border">
+                {clientDeals.map((deal) => (
+                  <li
+                    key={deal.id}
+                    className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    View in hub
-                  </Link>
-                )}
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {dealDocuments.map((doc) => (
-                    <li
-                      key={doc.id}
-                      className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        {doc.status === 'complete' && (
-                          <CheckCircle2 className="size-4 text-success" aria-hidden />
-                        )}
-                        {doc.status === 'missing' && (
-                          <AlertCircle className="size-4 text-danger" aria-hidden />
-                        )}
-                        {doc.status === 'review' && (
-                          <Clock className="size-4 text-warning" aria-hidden />
-                        )}
-                        {doc.name}
-                      </span>
-                      <Badge
-                        variant="secondary"
-                        className={
-                          doc.status === 'missing'
-                            ? 'bg-danger/10 text-danger'
-                            : doc.status === 'review'
-                              ? 'bg-warning/10 text-warning'
-                              : 'bg-success/10 text-success'
-                        }
-                      >
-                        {doc.status}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
+                    <div className="min-w-0">
+                      <p className="font-medium text-text-primary">{deal.name}</p>
+                      <p className="mt-1 text-sm text-text-tertiary">
+                        Deal #{deal.id}, owned by {deal.owner}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4 sm:justify-end">
+                      <p className="text-xl font-semibold tabular-nums text-text-primary">
+                        {formatCurrency(deal.value)}
+                      </p>
+                      <ButtonLink href={`/deals/${deal.id}`} variant="brand">
+                        Open deal workspace
+                      </ButtonLink>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </Card>
           ) : (
             <Card className="border-border shadow-none">
               <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                No documents for this client&apos;s active deal.
+                No deals for this client yet.
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-6">
+          <ClientDocumentsPanel
+            documents={dealDocuments}
+            dealId={activeDeal?.id}
+            dealName={activeDeal?.name ?? client.name}
+          />
         </TabsContent>
 
         <TabsContent value="communications" className="mt-6">
@@ -232,19 +250,20 @@ export function ClientProfile ({ client }: ClientProfileProps) {
         </TabsContent>
 
         <TabsContent value="activity" className="mt-6">
-          {activities.length > 0 ? (
-            <Card className="border-border shadow-none">
-              <CardContent className="pt-6">
+          <Card className="border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base">Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {activities.length > 0 ? (
                 <ActivityFeed activities={activities} />
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-border shadow-none">
-              <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                No activity recorded yet.
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No activity recorded yet.
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

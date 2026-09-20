@@ -1,71 +1,97 @@
-import type { Document } from '@/domain/documents/document.types'
-import { Badge } from '@/components/ui/badge'
+import type { Document, DocumentStatus } from '@/domain/documents/document.types'
 import { ButtonLink } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle, CheckCircle2, Clock } from 'lucide-react'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface DealDocumentsSummaryProps {
   dealId: string
   documents: Document[]
-  missingCount: number
 }
 
-function DocumentStatusIcon ({ status }: { status: Document['status'] }) {
-  if (status === 'complete') {
-    return <CheckCircle2 className="size-4 text-success" aria-hidden />
-  }
-  if (status === 'missing') {
-    return <AlertCircle className="size-4 text-danger" aria-hidden />
-  }
-  return <Clock className="size-4 text-warning" aria-hidden />
+const STATUS_LABEL: Record<DocumentStatus, string> = {
+  complete: 'Verified',
+  review: 'Needs review',
+  missing: 'Missing',
+}
+
+const STATUS_CLASS: Record<DocumentStatus, string> = {
+  complete: 'bg-success/10 text-success',
+  review: 'bg-warning/10 text-warning',
+  missing: 'bg-danger/10 text-danger',
 }
 
 export function DealDocumentsSummary ({
   dealId,
   documents,
-  missingCount,
 }: DealDocumentsSummaryProps) {
   const requiredDocs = documents.filter((doc) => doc.required)
+  const verifiedCount = requiredDocs.filter(
+    (doc) => doc.status === 'complete'
+  ).length
+  const progress =
+    requiredDocs.length === 0
+      ? 0
+      : Math.round((verifiedCount / requiredDocs.length) * 100)
 
   return (
     <Card className="border-border shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader>
         <CardTitle className="text-base font-semibold">Documents</CardTitle>
-        {missingCount > 0 && (
-          <Badge variant="secondary" className="bg-danger/10 text-danger">
-            {missingCount} missing
-          </Badge>
-        )}
+        <CardAction>
+          <ButtonLink
+            href={`/documents?deal=${dealId}`}
+            variant="ghost"
+            size="sm"
+            className="text-text-secondary"
+          >
+            Open
+          </ButtonLink>
+        </CardAction>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ul className="space-y-2">
-          {requiredDocs.map((doc) => (
-            <li
-              key={doc.id}
-              className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between"
-            >
-              <span className="inline-flex items-center gap-2">
-                <DocumentStatusIcon status={doc.status} />
-                <span>{doc.name}</span>
-              </span>
-              <Badge
-                variant="secondary"
-                className={
-                  doc.status === 'missing'
-                    ? 'bg-danger/10 text-danger'
-                    : doc.status === 'review'
-                      ? 'bg-warning/10 text-warning'
-                      : 'bg-success/10 text-success'
-                }
+        {requiredDocs.length === 0 ? (
+          <p className="text-sm text-text-secondary">
+            No documents recorded yet.
+          </p>
+        ) : (
+          <>
+            <div className="flex items-center gap-3">
+              <div
+                role="progressbar"
+                aria-valuenow={verifiedCount}
+                aria-valuemin={0}
+                aria-valuemax={requiredDocs.length}
+                aria-label="Documents verified"
+                className="h-1.5 flex-1 overflow-hidden rounded-full bg-border"
               >
-                {doc.status}
-              </Badge>
-            </li>
-          ))}
-        </ul>
-        <ButtonLink href={`/documents?deal=${dealId}`} variant="outline" size="sm">
-          View all documents
-        </ButtonLink>
+                <div
+                  className="h-full rounded-full bg-phb-yellow"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs tabular-nums text-text-tertiary">
+                {verifiedCount} of {requiredDocs.length}
+              </p>
+            </div>
+            <ul className="space-y-2.5">
+              {requiredDocs.map((doc) => (
+                <li key={doc.id} className="flex items-center gap-2.5 text-sm">
+                  <span
+                    className={cn(
+                      'inline-flex h-5 shrink-0 items-center rounded-full px-2 text-[11px] font-medium',
+                      STATUS_CLASS[doc.status]
+                    )}
+                  >
+                    {STATUS_LABEL[doc.status]}
+                  </span>
+                  <span className="min-w-0 truncate text-text-primary">
+                    {doc.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </CardContent>
     </Card>
   )

@@ -5,31 +5,64 @@ import {
 } from '@/data/demo/packages'
 import { formatCurrency } from '@/lib/formatting'
 import { ButtonLink } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Home, MapPin } from 'lucide-react'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface DealPackageSummaryProps {
   dealId: string
   packageConfig?: DealPackageConfig
 }
 
+function PackageRow ({
+  label,
+  value,
+  emphasize = false,
+}: {
+  label: string
+  value: string
+  emphasize?: boolean
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 py-1.5">
+      <dt className="text-sm text-text-secondary">{label}</dt>
+      <dd
+        className={
+          emphasize
+            ? 'text-sm font-semibold tabular-nums text-text-primary'
+            : 'text-right text-sm font-medium text-text-primary'
+        }
+      >
+        {value}
+      </dd>
+    </div>
+  )
+}
+
 export function DealPackageSummary ({
   dealId,
   packageConfig,
 }: DealPackageSummaryProps) {
+  const builderHref = `/packages/builder?dealId=${dealId}`
+
   if (!packageConfig) {
     return (
       <Card className="border-border shadow-none">
-        <CardHeader className="pb-2">
+        <CardHeader>
           <CardTitle className="text-base font-semibold">Package</CardTitle>
+          <CardAction>
+            <ButtonLink
+              href={builderHref}
+              variant="ghost"
+              size="sm"
+              className="text-text-secondary"
+            >
+              Open builder
+            </ButtonLink>
+          </CardAction>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
+        <CardContent>
+          <p className="text-sm text-text-secondary">
             No package configured yet.
           </p>
-          <ButtonLink href={`/packages/builder?dealId=${dealId}`} variant="brand" size="sm">
-            Configure package
-          </ButtonLink>
         </CardContent>
       </Card>
     )
@@ -37,48 +70,44 @@ export function DealPackageSummary ({
 
   const land = demoLandLots.find((lot) => lot.id === packageConfig.landId)
   const design = demoHouseDesigns.find(
-    (d) => d.id === packageConfig.designId
+    (item) => item.id === packageConfig.designId
   )
 
   return (
     <Card className="border-border shadow-none">
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle className="text-base font-semibold">Package</CardTitle>
+        <CardAction>
+          <ButtonLink
+            href={builderHref}
+            variant="ghost"
+            size="sm"
+            className="text-text-secondary"
+          >
+            Open builder
+          </ButtonLink>
+        </CardAction>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="rounded-lg border border-border bg-surface-muted p-3 space-y-2">
-          {land && (
-            <div className="flex items-start gap-2 text-sm">
-              <MapPin className="mt-0.5 size-4 shrink-0 text-phb-red" aria-hidden />
-              <div>
-                <p className="font-medium">{land.suburb}</p>
-                <p className="text-text-secondary">{land.name}</p>
-                <p className="text-text-tertiary">{formatCurrency(land.price)}</p>
-              </div>
-            </div>
-          )}
-          {design && (
-            <div className="flex items-start gap-2 text-sm">
-              <Home className="mt-0.5 size-4 shrink-0 text-phb-red" aria-hidden />
-              <div>
-                <p className="font-medium">{design.name}</p>
-                <p className="text-text-secondary">
-                  {design.bedrooms} bed · {design.bathrooms} bath · {design.cars} car
-                </p>
-                <p className="text-text-tertiary">{formatCurrency(design.price)}</p>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-text-secondary">Total package</span>
-          <span className="text-lg font-semibold text-text-primary">
-            {formatCurrency(packageConfig.total)}
-          </span>
-        </div>
-        <ButtonLink href={`/packages/builder?dealId=${dealId}`} variant="outline" size="sm">
-          Edit package
-        </ButtonLink>
+      <CardContent>
+        <dl>
+          {land ? (
+            <PackageRow
+              label="Land"
+              value={`${land.suburb}, ${land.size}`}
+            />
+          ) : null}
+          {design ? (
+            <PackageRow label="Builder" value={design.builder} />
+          ) : null}
+          {design ? (
+            <PackageRow label="Design" value={design.name} />
+          ) : null}
+          <PackageRow
+            label="Total"
+            value={formatCurrency(packageConfig.total)}
+            emphasize
+          />
+        </dl>
       </CardContent>
     </Card>
   )

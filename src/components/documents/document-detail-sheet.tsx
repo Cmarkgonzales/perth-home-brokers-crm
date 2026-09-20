@@ -79,7 +79,7 @@ export function DocumentDetailSheet ({
               <Upload className="mx-auto mb-2 size-8 text-text-tertiary" aria-hidden />
               <p className="text-sm font-medium">Upload document</p>
               <p className="mt-1 text-xs text-text-tertiary">
-                Drag and drop or click to browse. Upload is UI-only in this prototype.
+                Drag and drop or click to browse.
               </p>
               <Button
                 variant="outline"

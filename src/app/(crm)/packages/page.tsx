@@ -1,12 +1,17 @@
 import { demoDeals, getPackageConfigForDeal } from '@/data/demo'
+import type { DealStage } from '@/domain/deals/deal.types'
 import { formatCurrency } from '@/lib/formatting'
 import { PageHeader } from '@/components/layout/page-header'
 import { ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DealStageBadge } from '@/components/deals/deal-stage-badge'
 
+const PACKAGE_STAGES: DealStage[] = ['land', 'builder', 'package', 'drafting']
+
 export default function PackagesPage () {
-  const activeDeals = demoDeals.filter((deal) => deal.stage !== 'settlement')
+  const activeDeals = demoDeals.filter((deal) =>
+    PACKAGE_STAGES.includes(deal.stage)
+  )
 
   return (
     <div className="space-y-6">

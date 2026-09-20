@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import type { Activity } from '@/domain/activities/activity.types'
 import type { TimelineFilter } from '@/domain/activities/activity.types'
-import { formatDate } from '@/lib/formatting'
+import { formatMonthDay } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const FILTER_OPTIONS: { value: TimelineFilter | 'all'; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -17,6 +17,14 @@ const FILTER_OPTIONS: { value: TimelineFilter | 'all'; label: string }[] = [
   { value: 'client', label: 'Client' },
   { value: 'ai', label: 'AI' },
 ]
+
+const CATEGORY_BADGE_CLASS: Record<TimelineFilter, string> = {
+  finance: 'bg-info/10 text-info',
+  admin: 'bg-surface-strong text-text-secondary',
+  builder: 'bg-warning/10 text-warning',
+  client: 'bg-success/10 text-success',
+  ai: 'bg-phb-yellow/25 text-text-primary',
+}
 
 interface DealTimelineProps {
   activities: Activity[]
@@ -31,33 +39,39 @@ export function DealTimeline ({
 }: DealTimelineProps) {
   const [filter, setFilter] = useState<TimelineFilter | 'all'>('all')
 
-  const filtered =
+  const filtered = (
     filter === 'all'
       ? activities
       : activities.filter((activity) => activity.category === filter)
+  )
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date))
 
   return (
     <Card className="border-border shadow-none">
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle className="text-base font-semibold">{title}</CardTitle>
-        {showFilters && (
-          <div className="flex flex-wrap gap-1.5 pt-2">
-            {FILTER_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                variant={filter === option.value ? 'secondary' : 'ghost'}
-                size="xs"
-                onClick={() => setFilter(option.value)}
-                className={cn(
-                  filter === option.value &&
-                    'bg-surface-strong text-text-primary'
-                )}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-        )}
+        {showFilters ? (
+          <CardAction className="max-w-full">
+            <div className="flex flex-wrap justify-end gap-1 rounded-lg bg-surface-muted p-1">
+              {FILTER_OPTIONS.map((option) => (
+                <Button
+                  key={option.value}
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => setFilter(option.value)}
+                  className={cn(
+                    'rounded-md text-text-secondary hover:text-text-primary',
+                    filter === option.value &&
+                      'bg-surface font-medium text-text-primary'
+                  )}
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </CardAction>
+        ) : null}
       </CardHeader>
       <CardContent>
         {filtered.length === 0 ? (
@@ -65,49 +79,67 @@ export function DealTimeline ({
             No activities match this filter.
           </p>
         ) : (
-          <ul className="relative space-y-0">
+          <ol>
             {filtered.map((activity, index) => (
-              <li key={activity.id} className="relative flex gap-4 pb-6 last:pb-0">
-                {index < filtered.length - 1 && (
-                  <div
-                    className="absolute left-[7px] top-4 h-full w-0.5 bg-border"
-                    aria-hidden
-                  />
-                )}
-                <div className="relative z-10 mt-1.5">
+              <li
+                key={activity.id}
+                className="grid grid-cols-[3.5rem_0.875rem_minmax(0,1fr)] gap-x-3 pb-6 last:pb-0"
+              >
+                <div className="pt-0.5 text-right">
+                  {activity.isToday ? (
+                    <Badge className="bg-phb-yellow text-text-primary hover:bg-phb-yellow">
+                      Today
+                    </Badge>
+                  ) : (
+                    <p className="text-xs text-text-tertiary">
+                      {formatMonthDay(activity.date)}
+                    </p>
+                  )}
+                </div>
+                <div className="relative flex justify-center">
+                  {index < filtered.length - 1 ? (
+                    <div
+                      className="absolute top-4 bottom-[-24px] w-px bg-border"
+                      aria-hidden
+                    />
+                  ) : null}
                   <div
                     className={cn(
-                      'size-4 rounded-full border-2 bg-surface',
+                      'relative z-10 mt-1.5 size-3.5 rounded-full border-2',
                       activity.isToday
-                        ? 'border-phb-yellow bg-phb-yellow'
-                        : 'border-border-strong'
+                        ? 'border-text-primary bg-text-primary'
+                        : 'border-phb-yellow bg-phb-yellow'
                     )}
                   />
                 </div>
-                <div className="min-w-0 flex-1 space-y-1">
+                <div className="min-w-0 space-y-0.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs text-text-tertiary">
-                      {formatDate(activity.date)}
+                    <p className="text-sm font-semibold text-text-primary">
+                      {activity.title}
                     </p>
-                    {activity.isToday && (
-                      <Badge className="bg-phb-yellow/20 text-text-primary hover:bg-phb-yellow/20">
-                        TODAY
-                      </Badge>
-                    )}
-                    <Badge variant="secondary" className="text-[10px] capitalize">
-                      {activity.category}
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        'capitalize',
+                        CATEGORY_BADGE_CLASS[activity.category]
+                      )}
+                    >
+                      {activity.category === 'ai'
+                        ? 'AI'
+                        : activity.category.charAt(0).toUpperCase() +
+                          activity.category.slice(1)}
                     </Badge>
                   </div>
-                  <p className="text-sm font-medium text-text-primary">
-                    {activity.title}
-                  </p>
                   <p className="text-sm text-text-secondary">
                     {activity.description}
                   </p>
+                  {activity.actor ? (
+                    <p className="text-xs text-text-tertiary">{activity.actor}</p>
+                  ) : null}
                 </div>
               </li>
             ))}
-          </ul>
+          </ol>
         )}
       </CardContent>
     </Card>

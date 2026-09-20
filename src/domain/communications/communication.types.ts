@@ -1,4 +1,4 @@
-export type CommunicationChannel = 'email' | 'sms' | 'call'
+export type CommunicationChannel = 'email' | 'sms' | 'call' | 'whatsapp'
 
 export interface Communication {
   id: string
@@ -9,4 +9,5 @@ export interface Communication {
   subject: string
   summary: string
   direction: 'inbound' | 'outbound'
+  sender?: string
 }

@@ -7,4 +7,7 @@ export interface Document {
   status: DocumentStatus
   required: boolean
   uploadedAt?: string
+  party?: string
+  fileName?: string
+  source?: string
 }

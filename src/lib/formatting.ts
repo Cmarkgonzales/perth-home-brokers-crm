@@ -65,7 +65,54 @@ export function formatDate (date: string): string {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  }).format(new Date(date))
+  }).format(new Date(`${date}T00:00:00`))
+}
+
+const SHORT_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+] as const
+
+export function formatCompactDate (date: string, today: string): string {
+  if (date === today) return 'Today'
+
+  const parts = date.split('-')
+  const monthIndex = Number(parts[1]) - 1
+  const day = Number(parts[2])
+  const month = SHORT_MONTHS[monthIndex]
+
+  if (!month || Number.isNaN(day)) return date
+  return `${day} ${month}`
+}
+
+export function formatMonthDay (date: string): string {
+  const parts = date.split('-')
+  const month = SHORT_MONTHS[Number(parts[1]) - 1]
+  const day = Number(parts[2])
+
+  if (!month || Number.isNaN(day)) return date
+  return `${month} ${String(day).padStart(2, '0')}`
+}
+
+export function getInitials (name: string): string {
+  const parts = name
+    .replace(/[^A-Za-z\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
 }
 
 export function getGreeting (): string {

@@ -9,6 +9,8 @@ import type {
   DocumentCheckResult,
   LeadAssessment,
 } from '@/domain/ai/ai.types'
+import type { Lead } from '@/domain/leads/lead.types'
+import { formatCurrency } from '@/lib/formatting'
 
 let messageCounter = 0
 
@@ -44,42 +46,114 @@ export function getBriefing (): AiBriefing {
   }
 }
 
-export function assessLead (leadId: string): LeadAssessment | null {
-  if (leadId === 'lead-001') {
+const LEAD_ASSESSMENT_OVERRIDES: Record<
+  string,
+  Omit<LeadAssessment, 'leadId' | 'leadName' | 'estimatedBudget'>
+> = {
+  'lead-001': {
+    intent: 'High',
+    timeline: '3–6 months',
+    financeRisk: 'Medium',
+    summary:
+      'Converted first-home buyers with a saved deposit. Sarah appears ready to proceed, but the finance assessment is still outstanding before land selection can lock in.',
+    recommendedAction:
+      'Email Sarah the finance document checklist and book a 20-minute consultation.',
+    recommendedChannel: 'email',
+  },
+  'lead-002': {
+    intent: 'High',
+    timeline: '1–3 months',
+    financeRisk: 'Low',
+    summary:
+      'Referral lead with strong intent and pre-approved finance. Package selection is underway — the builder quote is the remaining blocker.',
+    recommendedAction: 'Call Michael to confirm the builder quote review.',
+    recommendedChannel: 'call',
+  },
+  'lead-003': {
+    intent: 'Medium',
+    timeline: '6–12 months',
+    financeRisk: 'Medium',
+    summary:
+      'Responded to a Facebook ad and has not been contacted since. The budget is at the upper end of outer-metro house-and-land packages, but employment and deposit details are missing.',
+    recommendedAction:
+      'Call today and book a 20-minute finance consultation.',
+    recommendedChannel: 'call',
+  },
+  'lead-004': {
+    intent: 'Medium',
+    timeline: '6–12 months',
+    financeRisk: 'Medium',
+    summary:
+      'Visited an open home and has not had a consult booked. The budget is realistic for the outer southern suburbs, but employment and deposit details are missing.',
+    recommendedAction:
+      'Call today and book a 20-minute finance consultation.',
+    recommendedChannel: 'call',
+  },
+  'lead-005': {
+    intent: 'Medium',
+    timeline: '3–6 months',
+    financeRisk: 'Medium',
+    summary:
+      'Website enquiry with a workable budget. No consult has been booked and first-home-buyer eligibility has not been confirmed.',
+    recommendedAction: 'SMS Liam a booking link for a discovery call.',
+    recommendedChannel: 'sms',
+  },
+  'lead-006': {
+    intent: 'Medium',
+    timeline: '6–12 months',
+    financeRisk: 'Low',
+    summary:
+      'Referral enquiry that has not been qualified. Timeline is flexible; confirm deposit position before offering a land shortlist.',
+    recommendedAction: 'Email Jack a short qualification questionnaire.',
+    recommendedChannel: 'email',
+  },
+}
+
+function fallbackAssessment (
+  lead: Lead
+): Omit<LeadAssessment, 'leadId' | 'leadName' | 'estimatedBudget'> {
+  if (lead.status === 'Lost') {
     return {
-      leadId,
-      leadName: 'Sarah & James Williams',
-      intent: 'HIGH',
-      estimatedBudget: 650000,
-      timeline: '3–6 months',
-      financeRisk: 'Medium',
+      intent: 'Low',
+      timeline: 'Unknown',
+      financeRisk: 'High',
       summary:
-        'Sarah appears ready to proceed but has not completed her finance assessment. Strong first-home buyer profile with deposit saved.',
-      recommendedAction: 'Schedule finance consultation',
+        'This enquiry is marked lost. Review the last contact notes before any further outreach.',
+      recommendedAction: 'Call to confirm whether the enquiry should be reopened.',
+      recommendedChannel: 'call',
     }
   }
-  if (leadId === 'lead-002') {
+
+  if (lead.status === 'Qualified' || lead.status === 'Converted') {
     return {
-      leadId,
-      leadName: 'Michael Chen',
-      intent: 'HIGH',
-      estimatedBudget: 720000,
+      intent: 'High',
       timeline: '1–3 months',
       financeRisk: 'Low',
-      summary:
-        'Referral lead with pre-approved finance. Package selection in progress — builder quote pending approval.',
-      recommendedAction: 'Follow up on builder quote approval',
+      summary: `${lead.name} is ${lead.status.toLowerCase()} from ${lead.source}. Finance and package next steps should stay with ${lead.owner}.`,
+      recommendedAction: `Email ${lead.name} a confirmation of the next qualification step.`,
+      recommendedChannel: 'email',
     }
   }
+
   return {
-    leadId,
-    leadName: 'Unknown lead',
-    intent: 'MEDIUM',
-    estimatedBudget: 550000,
-    timeline: '6+ months',
+    intent: 'Medium',
+    timeline: '6–12 months',
     financeRisk: 'Medium',
-    summary: 'Limited information available. Recommend initial consultation.',
-    recommendedAction: 'Schedule discovery call',
+    summary: `Limited qualification notes from ${lead.source}. The stated budget is ${formatCurrency(lead.budget)}, but employment and deposit details are missing.`,
+    recommendedAction:
+      'Call today and book a 20-minute finance consultation.',
+    recommendedChannel: 'call',
+  }
+}
+
+export function assessLead (lead: Lead): LeadAssessment {
+  const details = LEAD_ASSESSMENT_OVERRIDES[lead.id] ?? fallbackAssessment(lead)
+
+  return {
+    leadId: lead.id,
+    leadName: lead.name,
+    estimatedBudget: lead.budget,
+    ...details,
   }
 }
 
@@ -137,7 +211,8 @@ export function getDealInsight (dealId: string): DealAiInsight | null {
     return {
       dealId,
       insight:
-        'Client is ready for finance review. Bank statement is missing — request before lender submission.',
+        'Sarah and James are 68% through the deal and waiting on finance approval. 3 of 6 documents are verified; the bank statement and the finance declaration are still missing. James\'s payslip has a possible employer name mismatch.',
+      suggestedNextStep: 'finance documents need review',
       nextActions: [
         'Request bank statement from Sarah',
         'Assign review task to Zoe',
