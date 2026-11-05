@@ -7,6 +7,7 @@ import { getRequiredDocumentProgress } from '@/domain/documents/document-utils'
 import { DocumentProgressBar } from '@/components/documents/document-progress-bar'
 import { ButtonLink } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DealContractsSummaryLine } from '@/components/deals/deal-contracts-summary-line'
 import { cn } from '@/lib/utils'
 
 interface DealDocumentsSummaryProps {
@@ -37,6 +38,7 @@ export function DealDocumentsSummary ({
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-4">
+        <DealContractsSummaryLine dealId={dealId} />
         {requiredCount === 0 ? (
           <p className="text-sm text-text-secondary">
             No documents recorded yet.

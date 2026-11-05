@@ -5,6 +5,7 @@ import type { Deal } from '@/domain/deals/deal.types'
 import type { Document } from '@/domain/documents/document.types'
 import { DealDocumentsAiPanel } from '@/components/documents/deal-documents-ai-panel'
 import { DocumentDetailSheet } from '@/components/documents/document-detail-sheet'
+import { DealContractsSection } from '@/components/documents/deal-contracts-section'
 import { RequiredDocumentsList } from '@/components/documents/required-documents-list'
 import { ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -42,6 +43,8 @@ export function DealDocumentsDetail ({
             Back to deal
           </ButtonLink>
         </div>
+
+        <DealContractsSection dealId={deal.id} />
 
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_24rem]">
           <RequiredDocumentsList

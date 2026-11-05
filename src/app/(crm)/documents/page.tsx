@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getDocumentsGroupedByDeal } from '@/data/demo'
 import { PageHeader } from '@/components/layout/page-header'
+import { ContractsHubSection } from '@/components/documents/contracts-hub-section'
 import { DocumentsHub } from '@/components/documents/documents-hub'
 
 export default async function DocumentsPage ({
@@ -23,6 +24,7 @@ export default async function DocumentsPage ({
       />
 
       <DocumentsHub groups={groups} />
+      <ContractsHubSection />
     </div>
   )
 }
