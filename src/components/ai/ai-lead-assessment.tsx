@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Sheet,
+  SheetBody,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -307,7 +308,7 @@ export function AiLeadAssessment ({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
+        <SheetBody className="max-h-none flex-1 space-y-5 px-4">
           <div className="flex items-center gap-3">
             <Avatar>
               <AvatarFallback className="bg-surface-strong text-xs font-medium text-text-secondary">
@@ -344,7 +345,7 @@ export function AiLeadAssessment ({
             The AI suggests next steps for the consultant. It doesn&apos;t assess
             loan eligibility.
           </p>
-        </div>
+        </SheetBody>
 
         {isComposingTask || createdTask ? (
           <div className="shrink-0 space-y-3 border-t border-border px-4 py-4">

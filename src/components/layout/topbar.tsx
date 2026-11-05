@@ -11,7 +11,9 @@ import { UserMenu } from '@/components/layout/user-menu'
 import { Button, ButtonLink } from '@/components/ui/button'
 import {
   Sheet,
+  SheetBody,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
@@ -64,15 +66,20 @@ export function Topbar ({ pendingApprovalCount }: TopbarProps) {
       </div>
 
       <Sheet open={searchOpen} onOpenChange={setSearchOpen}>
-        <SheetContent side="top" className="gap-3 p-4">
-          <SheetHeader className="p-0">
-            <SheetTitle>Search leads, clients and deals</SheetTitle>
+        <SheetContent side="top" className="gap-0 p-0">
+          <SheetHeader>
+            <SheetTitle>Search CRM</SheetTitle>
+            <SheetDescription>
+              Leads, clients, and deals
+            </SheetDescription>
           </SheetHeader>
+          <SheetBody className="max-h-none py-3">
           <CrmSearch
             autoFocus={searchOpen}
             layout="inline"
             onNavigate={() => setSearchOpen(false)}
           />
+          </SheetBody>
         </SheetContent>
       </Sheet>
     </header>

@@ -29,12 +29,15 @@ import { usePackageWorkspace } from '@/components/packages/use-package-workspace
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { CheckCircle2, Send } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -366,14 +369,25 @@ function PackageBuilderEditor ({
       />
 
       <Dialog open={savedDialogOpen} onOpenChange={setSavedDialogOpen}>
-        <DialogContent>
+        <DialogContent size="sm">
           <DialogHeader>
+            <DialogHeaderIcon className="bg-success/10">
+              <CheckCircle2 className="size-4 text-success" aria-hidden />
+            </DialogHeaderIcon>
             <DialogTitle>Package saved</DialogTitle>
             <DialogDescription>
-              {selectedLand.suburb} + {selectedDesign.name} configuration saved
-              for {deal.name} at {formatCurrency(total)}.
+              Configuration stored for this deal.
             </DialogDescription>
           </DialogHeader>
+          <DialogBody className="space-y-2 py-3">
+            <p className="text-sm text-text-primary">
+              {selectedLand.suburb} + {selectedDesign.name}
+            </p>
+            <p className="text-sm font-semibold tabular-nums text-text-primary">
+              {formatCurrency(total)}
+            </p>
+            <p className="text-xs text-text-tertiary">{deal.name}</p>
+          </DialogBody>
           <DialogFooter>
             <Button onClick={() => setSavedDialogOpen(false)}>Done</Button>
           </DialogFooter>
@@ -381,17 +395,28 @@ function PackageBuilderEditor ({
       </Dialog>
 
       <Dialog open={presentDialogOpen} onOpenChange={setPresentDialogOpen}>
-        <DialogContent>
+        <DialogContent size="sm">
           <DialogHeader>
+            <DialogHeaderIcon>
+              <Send className="size-4 text-text-secondary" aria-hidden />
+            </DialogHeaderIcon>
             <DialogTitle>Present to client</DialogTitle>
             <DialogDescription>
-              A presentation link would be sent to the client. This is a demo
-              confirmation only — no email is sent.
+              Share this package summary with the client.
             </DialogDescription>
           </DialogHeader>
+          <DialogBody className="py-3">
+            <p className="text-sm text-text-secondary">
+              A presentation link would be sent to the client. This is a demo
+              confirmation only — no email is sent.
+            </p>
+          </DialogBody>
           <DialogFooter>
+            <Button variant="outline" onClick={() => setPresentDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button variant="brand" onClick={() => setPresentDialogOpen(false)}>
-              Confirm
+              Send presentation
             </Button>
           </DialogFooter>
         </DialogContent>

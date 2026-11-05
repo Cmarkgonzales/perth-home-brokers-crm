@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
+  SheetBody,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -54,7 +55,7 @@ export function DocumentDetailSheet ({
           <SheetDescription>{dealName}</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 px-4">
+        <SheetBody className="max-h-none">
           <div className="flex items-center justify-between text-sm">
             <span className="text-text-secondary">Status</span>
             <Badge
@@ -113,7 +114,7 @@ export function DocumentDetailSheet ({
           {(agentComplete || document.status === 'review') && (
             <AiDocumentCheck documentId={document.id} />
           )}
-        </div>
+        </SheetBody>
 
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

@@ -9,12 +9,16 @@ import { demoLandLots } from '@/data/demo/packages'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { BookmarkPlus } from 'lucide-react'
+import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
 
 interface SaveAsTemplateDialogProps {
@@ -63,34 +67,35 @@ export function SaveAsTemplateDialog ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent size="md">
         <DialogHeader>
+          <DialogHeaderIcon>
+            <BookmarkPlus className="size-4 text-text-secondary" aria-hidden />
+          </DialogHeaderIcon>
           <DialogTitle>Save as custom template</DialogTitle>
           <DialogDescription>
             Save the current land, design, and upgrades as a reusable template.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
-          <label htmlFor="save-template-name" className="text-sm font-medium">
-            Template name
-          </label>
-          <Input
-            id="save-template-name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder={
-              design && land
-                ? `${design.name} · ${land.suburb}`
-                : 'Template name'
-            }
-          />
-          {error ? (
-            <p className="text-sm text-danger" role="alert">
-              {error}
-            </p>
-          ) : null}
-        </div>
+        <DialogBody>
+          <FormField
+            label="Template name"
+            htmlFor="save-template-name"
+            error={error ?? undefined}
+          >
+            <Input
+              id="save-template-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder={
+                design && land
+                  ? `${design.name} · ${land.suburb}`
+                  : 'Template name'
+              }
+            />
+          </FormField>
+        </DialogBody>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -14,17 +14,23 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { FormField } from '@/components/ui/form-field'
+import { Textarea } from '@/components/ui/textarea'
 import { AiApprovalSummary } from '@/components/ai/ai-approval-summary'
 import {
   AlertCircle,
   CheckCircle2,
   Clock,
+  MessageSquareWarning,
+  XCircle,
 } from 'lucide-react'
 
 interface ApprovalReviewProps {
@@ -49,13 +55,27 @@ const statusLabels: Record<ApprovalStatus, string> = {
   rejected: 'Rejected',
 }
 
+type ConfirmAction = Extract<
+  ApprovalStatus,
+  'approved' | 'changes_requested' | 'rejected'
+>
+
 export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
   const [status, setStatus] = useState<ApprovalStatus>(approval.status)
-  const [confirmAction, setConfirmAction] = useState<ApprovalStatus | null>(null)
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(
+    null
+  )
+  const [actionNote, setActionNote] = useState('')
 
-  function handleAction (nextStatus: ApprovalStatus) {
+  function handleAction (nextStatus: ConfirmAction) {
     setStatus(nextStatus)
     setConfirmAction(null)
+    setActionNote('')
+  }
+
+  function closeConfirm () {
+    setConfirmAction(null)
+    setActionNote('')
   }
 
   return (
@@ -191,28 +211,123 @@ export function ApprovalReview ({ approval, documents }: ApprovalReviewProps) {
 
       <Dialog
         open={confirmAction !== null}
-        onOpenChange={(open) => !open && setConfirmAction(null)}
+        onOpenChange={(open) => !open && closeConfirm()}
       >
-        <DialogContent>
+        <DialogContent size="md">
           <DialogHeader>
+            {confirmAction === 'approved' ? (
+              <DialogHeaderIcon className="bg-success/10">
+                <CheckCircle2 className="size-4 text-success" aria-hidden />
+              </DialogHeaderIcon>
+            ) : null}
+            {confirmAction === 'changes_requested' ? (
+              <DialogHeaderIcon className="bg-warning/10">
+                <MessageSquareWarning
+                  className="size-4 text-warning"
+                  aria-hidden
+                />
+              </DialogHeaderIcon>
+            ) : null}
+            {confirmAction === 'rejected' ? (
+              <DialogHeaderIcon className="bg-danger/10">
+                <XCircle className="size-4 text-danger" aria-hidden />
+              </DialogHeaderIcon>
+            ) : null}
             <DialogTitle>
               {confirmAction === 'approved' && 'Approve request'}
               {confirmAction === 'changes_requested' && 'Request changes'}
               {confirmAction === 'rejected' && 'Reject request'}
             </DialogTitle>
             <DialogDescription>
-              Confirm to approve, request changes, or reject the request.
+              {confirmAction === 'approved' &&
+                'This will mark the approval complete and notify the deal owner.'}
+              {confirmAction === 'changes_requested' &&
+                'Send the assignee a clear list of what must be updated before approval.'}
+              {confirmAction === 'rejected' &&
+                'Rejecting stops this approval. Provide a reason for the record.'}
             </DialogDescription>
           </DialogHeader>
+
+          <DialogBody className="space-y-4">
+            <div className="rounded-lg border border-border bg-surface-muted p-3 text-sm">
+              <p className="font-medium text-text-primary">{approval.title}</p>
+              <dl className="mt-2 space-y-1 text-text-secondary">
+                <div className="flex justify-between gap-3">
+                  <dt>Client</dt>
+                  <dd className="text-right font-medium text-text-primary">
+                    {approval.clientName}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt>Deal value</dt>
+                  <dd className="tabular-nums text-text-primary">
+                    {formatCurrency(approval.dealValue)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt>Due</dt>
+                  <dd>{formatDate(approval.dueDate)}</dd>
+                </div>
+              </dl>
+            </div>
+
+            {confirmAction === 'approved' ? (
+              <p className="text-sm font-medium text-success">
+                Documents and deal context look ready to proceed.
+              </p>
+            ) : null}
+
+            {confirmAction === 'changes_requested' ? (
+              <FormField
+                label="Requested changes"
+                htmlFor="approval-changes-note"
+                required
+                description="What needs to be fixed or resubmitted?"
+              >
+                <Textarea
+                  id="approval-changes-note"
+                  value={actionNote}
+                  onChange={(event) => setActionNote(event.target.value)}
+                  placeholder="Update builder quote to match selected land lot…"
+                  rows={3}
+                  required
+                />
+              </FormField>
+            ) : null}
+
+            {confirmAction === 'rejected' ? (
+              <FormField
+                label="Rejection reason"
+                htmlFor="approval-reject-note"
+                required
+                description="Required for audit and client communication."
+              >
+                <Textarea
+                  id="approval-reject-note"
+                  value={actionNote}
+                  onChange={(event) => setActionNote(event.target.value)}
+                  placeholder="Quote exceeds approved finance limit…"
+                  rows={3}
+                  required
+                />
+              </FormField>
+            ) : null}
+          </DialogBody>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmAction(null)}>
+            <Button variant="outline" onClick={closeConfirm}>
               Cancel
             </Button>
             <Button
               variant={confirmAction === 'rejected' ? 'destructive' : 'brand'}
+              disabled={
+                confirmAction !== 'approved' && actionNote.trim().length === 0
+              }
               onClick={() => confirmAction && handleAction(confirmAction)}
             >
-              Confirm
+              {confirmAction === 'approved' && 'Approve'}
+              {confirmAction === 'changes_requested' && 'Send request'}
+              {confirmAction === 'rejected' && 'Reject'}
             </Button>
           </DialogFooter>
         </DialogContent>

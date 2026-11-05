@@ -12,12 +12,17 @@ import { usePackageWorkspace } from '@/components/packages/use-package-workspace
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { PackageOpen } from 'lucide-react'
+import { FormField } from '@/components/ui/form-field'
+import { Select } from '@/components/ui/select'
 
 interface ApplyTemplateDialogProps {
   template: ResolvedPackageTemplate | null
@@ -49,8 +54,11 @@ export function ApplyTemplateDialog ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent size="md">
         <DialogHeader>
+          <DialogHeaderIcon>
+            <PackageOpen className="size-4 text-text-secondary" aria-hidden />
+          </DialogHeaderIcon>
           <DialogTitle>Use template on deal</DialogTitle>
           <DialogDescription>
             {template
@@ -59,32 +67,30 @@ export function ApplyTemplateDialog ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
-          <label htmlFor="apply-deal" className="text-sm font-medium">
-            Deal
-          </label>
-          <select
-            id="apply-deal"
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            value={selectedDealId}
-            onChange={(event) => setSelectedDealId(event.target.value)}
-          >
-            <option value="">Select deal</option>
-            {deals.map((deal) => {
-              const client = demoClients.find((c) => c.id === deal.clientId)
-              const budgetHint =
-                client !== undefined && template
-                  ? ` · ${formatDealBudgetHint(client.budget, template.total)}`
-                  : ''
+        <DialogBody>
+          <FormField label="Deal" htmlFor="apply-deal">
+            <Select
+              id="apply-deal"
+              value={selectedDealId}
+              onChange={(event) => setSelectedDealId(event.target.value)}
+            >
+              <option value="">Select deal</option>
+              {deals.map((deal) => {
+                const client = demoClients.find((c) => c.id === deal.clientId)
+                const budgetHint =
+                  client !== undefined && template
+                    ? ` · ${formatDealBudgetHint(client.budget, template.total)}`
+                    : ''
 
-              return (
-                <option key={deal.id} value={deal.id}>
-                  {deal.name} ({deal.id}){budgetHint}
-                </option>
-              )
-            })}
-          </select>
-        </div>
+                return (
+                  <option key={deal.id} value={deal.id}>
+                    {deal.name} ({deal.id}){budgetHint}
+                  </option>
+                )
+              })}
+            </Select>
+          </FormField>
+        </DialogBody>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -9,12 +9,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { CircleDollarSign } from 'lucide-react'
 
 interface CommissionDetailProps {
   commission: Commission
@@ -111,13 +114,29 @@ export function CommissionDetail ({ commission }: CommissionDetailProps) {
       )}
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent>
+        <DialogContent size="sm">
           <DialogHeader>
+            <DialogHeaderIcon className="bg-success/10">
+              <CircleDollarSign className="size-4 text-success" aria-hidden />
+            </DialogHeaderIcon>
             <DialogTitle>Mark commission as paid?</DialogTitle>
             <DialogDescription>
-              This will update the commission status for {commission.dealName}.
+              Update the commission record when payment is confirmed.
             </DialogDescription>
           </DialogHeader>
+          <DialogBody className="py-3">
+            <p className="text-sm text-text-secondary">
+              This will mark{' '}
+              <span className="font-medium text-text-primary">
+                {commission.dealName}
+              </span>{' '}
+              as paid at{' '}
+              <span className="font-semibold tabular-nums text-text-primary">
+                {formatCurrency(commission.grossCommission)}
+              </span>
+              .
+            </p>
+          </DialogBody>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
@@ -126,7 +145,7 @@ export function CommissionDetail ({ commission }: CommissionDetailProps) {
               className="bg-phb-yellow text-text-primary hover:bg-phb-yellow-dark"
               onClick={handleMarkPaid}
             >
-              Confirm
+              Mark paid
             </Button>
           </DialogFooter>
         </DialogContent>

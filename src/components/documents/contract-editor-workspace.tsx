@@ -19,10 +19,14 @@ import { Button, ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogDescription,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { FileText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { FileUp, Save } from 'lucide-react'
 
@@ -322,10 +326,17 @@ function ContractEditorBody ({ dealId, contract }: ContractEditorBodyProps) {
       </div>
 
       <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
-        <DialogContent className="max-h-[90vh] sm:max-w-4xl">
+        <DialogContent size="lg" className="max-h-[90vh]">
           <DialogHeader>
+            <DialogHeaderIcon>
+              <FileText className="size-4 text-text-secondary" aria-hidden />
+            </DialogHeaderIcon>
             <DialogTitle>PDF preview</DialogTitle>
+            <DialogDescription>
+              Review the generated contract before download or send.
+            </DialogDescription>
           </DialogHeader>
+          <DialogBody className="max-h-none p-0 px-5 pb-5">
           {pdfPreviewUrl ? (
             <iframe
               title="Contract PDF preview"
@@ -333,6 +344,7 @@ function ContractEditorBody ({ dealId, contract }: ContractEditorBodyProps) {
               className="h-[70vh] w-full rounded-lg border border-border bg-surface-muted"
             />
           ) : null}
+          </DialogBody>
         </DialogContent>
       </Dialog>
     </div>

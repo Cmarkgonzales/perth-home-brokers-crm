@@ -9,12 +9,15 @@ import { Button, ButtonLink } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { CircleDollarSign } from 'lucide-react'
 
 interface CommissionPreviewProps {
   commission: Commission | null
@@ -165,23 +168,46 @@ export function CommissionPreview ({
           if (!open) setPendingStatus(null)
         }}
       >
-        <DialogContent>
+        <DialogContent size="sm">
           <DialogHeader>
+            <DialogHeaderIcon
+              className={
+                pendingStatus === 'paid' ? 'bg-success/10' : 'bg-surface-muted'
+              }
+            >
+              <CircleDollarSign
+                className={
+                  pendingStatus === 'paid'
+                    ? 'size-4 text-success'
+                    : 'size-4 text-text-secondary'
+                }
+                aria-hidden
+              />
+            </DialogHeaderIcon>
             <DialogTitle>
               {pendingStatus === 'expected'
                 ? 'Mark commission as expected?'
                 : 'Mark commission as paid?'}
             </DialogTitle>
             <DialogDescription>
-              {`This will update ${commission.dealName} to ${pendingLabel}.`}
+              Update the commission status on this deal.
             </DialogDescription>
           </DialogHeader>
+          <DialogBody className="py-3">
+            <p className="text-sm text-text-secondary">
+              {commission.dealName} will move to{' '}
+              <span className="font-medium text-text-primary">
+                {pendingLabel}
+              </span>{' '}
+              ({formatCurrency(commission.grossCommission)}).
+            </p>
+          </DialogBody>
           <DialogFooter>
             <Button variant="outline" onClick={closeConfirm}>
               Cancel
             </Button>
             <Button variant="brand" onClick={confirmStatusChange}>
-              Confirm
+              {pendingStatus === 'expected' ? 'Mark expected' : 'Mark paid'}
             </Button>
           </DialogFooter>
         </DialogContent>

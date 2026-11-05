@@ -5,12 +5,15 @@ import type { ContractSignature } from '@/domain/documents/contract.types'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { PenLine } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -115,14 +118,18 @@ export function SignatureCaptureDialog ({
         onOpenChange(nextOpen)
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent size="md">
         <DialogHeader>
+          <DialogHeaderIcon>
+            <PenLine className="size-4 text-text-secondary" aria-hidden />
+          </DialogHeaderIcon>
           <DialogTitle>Sign as {signatoryName}</DialogTitle>
           <DialogDescription>
             Type your name or draw your signature. This is stored for the prototype session only.
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody>
         <Tabs
           value={mode}
           onValueChange={(value) => setMode(value as 'typed' | 'drawn')}
@@ -158,6 +165,7 @@ export function SignatureCaptureDialog ({
             </Button>
           </TabsContent>
         </Tabs>
+        </DialogBody>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

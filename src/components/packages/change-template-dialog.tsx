@@ -15,12 +15,15 @@ import { usePackageWorkspace } from '@/components/packages/use-package-workspace
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHeaderIcon,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { LayoutTemplate } from 'lucide-react'
 
 interface ChangeTemplateDialogProps {
   open: boolean
@@ -63,20 +66,24 @@ export function ChangeTemplateDialog ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-hidden sm:max-w-lg">
+      <DialogContent size="md" className="max-h-[85vh]">
         <DialogHeader>
+          <DialogHeaderIcon>
+            <LayoutTemplate className="size-4 text-text-secondary" aria-hidden />
+          </DialogHeaderIcon>
           <DialogTitle>Change template</DialogTitle>
           <DialogDescription>
             Pick a starting template. Your deal will keep its own copy.
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody className="space-y-3">
         <input
           type="search"
           placeholder="Search templates…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         />
 
         <ul className="max-h-64 space-y-2 overflow-y-auto pr-1">
@@ -106,6 +113,7 @@ export function ChangeTemplateDialog ({
             </li>
           ))}
         </ul>
+        </DialogBody>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
