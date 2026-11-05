@@ -1,3 +1,11 @@
+export type PerfectForTag =
+  | 'first-home'
+  | 'growing-family'
+  | 'investor'
+  | 'downsizer'
+
+export type PackageTemplateOrigin = 'catalog' | 'custom'
+
 export interface LandLot {
   id: string
   name: string
@@ -15,6 +23,9 @@ export interface HouseDesign {
   bedrooms: number
   bathrooms: number
   cars: number
+  houseWidth: number
+  summary: string
+  perfectFor: PerfectForTag[]
   imageUrl?: string
 }
 
@@ -22,6 +33,17 @@ export interface PackageExtra {
   id: string
   name: string
   price: number
+}
+
+export interface PackageTemplate {
+  id: string
+  name: string
+  origin: PackageTemplateOrigin
+  designId: string
+  landId: string
+  includedExtras: string[]
+  priceNotes?: string
+  archived?: boolean
 }
 
 export interface DealPackageConfig {
@@ -33,4 +55,18 @@ export interface DealPackageConfig {
   buildPrice: number
   extrasTotal: number
   total: number
+  templateId?: string
+  customized?: boolean
+}
+
+export interface PackageTemplateFilters {
+  houseWidth: number | 'all'
+  bedrooms: number | 'all'
+  perfectFor: PerfectForTag | 'all'
+}
+
+export const DEFAULT_PACKAGE_TEMPLATE_FILTERS: PackageTemplateFilters = {
+  houseWidth: 'all',
+  bedrooms: 'all',
+  perfectFor: 'all',
 }

@@ -19,8 +19,10 @@ export {
   demoHouseDesigns,
   demoPackageExtras,
   demoPackageConfigs,
+  demoCatalogTemplates,
   calculatePackageTotal,
   estimateRepayment,
+  getCatalogTemplateById,
 } from '@/data/demo/packages'
 export {
   getClientById,

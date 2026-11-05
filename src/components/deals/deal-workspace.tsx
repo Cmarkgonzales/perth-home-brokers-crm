@@ -4,7 +4,6 @@ import type { Commission } from '@/domain/commissions/commission.types'
 import type { Deal } from '@/domain/deals/deal.types'
 import type { Document } from '@/domain/documents/document.types'
 import type { Activity } from '@/domain/activities/activity.types'
-import type { DealPackageConfig } from '@/domain/packages/package.types'
 import type { Task } from '@/domain/tasks/task.types'
 import { DealWorkspaceHeader } from '@/components/deals/deal-workspace-header'
 import { DealProgressCard } from '@/components/deals/deal-progress-card'
@@ -22,7 +21,6 @@ interface DealWorkspaceProps {
   documents: Document[]
   activities: Activity[]
   tasks: Task[]
-  packageConfig?: DealPackageConfig
   commission?: Commission
 }
 
@@ -32,7 +30,6 @@ export function DealWorkspace ({
   documents,
   activities,
   tasks,
-  packageConfig,
   commission,
 }: DealWorkspaceProps) {
   return (
@@ -53,7 +50,6 @@ export function DealWorkspace ({
         deal={deal}
         client={client}
         documents={documents}
-        packageConfig={packageConfig}
       />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -71,7 +67,7 @@ export function DealWorkspace ({
           />
           <DealDocumentsSummary dealId={deal.id} documents={documents} />
           <DealTasksPanel tasks={tasks} />
-          <DealPackageSummary dealId={deal.id} packageConfig={packageConfig} />
+          <DealPackageSummary dealId={deal.id} />
           {commission ? (
             <DealCommissionCard commission={commission} />
           ) : null}

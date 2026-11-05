@@ -3,6 +3,7 @@ import type {
   HouseDesign,
   LandLot,
   PackageExtra,
+  PackageTemplate,
 } from '@/domain/packages/package.types'
 
 export const demoLandLots: LandLot[] = [
@@ -38,6 +39,9 @@ export const demoHouseDesigns: HouseDesign[] = [
     bedrooms: 4,
     bathrooms: 2,
     cars: 2,
+    houseWidth: 12,
+    summary: 'Open-plan family layout with alfresco-ready living.',
+    perfectFor: ['growing-family', 'first-home'],
   },
   {
     id: 'design-madison',
@@ -47,6 +51,9 @@ export const demoHouseDesigns: HouseDesign[] = [
     bedrooms: 3,
     bathrooms: 2,
     cars: 2,
+    houseWidth: 10,
+    summary: 'Compact three-bedroom design suited to narrower lots.',
+    perfectFor: ['first-home', 'downsizer'],
   },
   {
     id: 'design-aria',
@@ -56,6 +63,45 @@ export const demoHouseDesigns: HouseDesign[] = [
     bedrooms: 4,
     bathrooms: 2,
     cars: 2,
+    houseWidth: 14,
+    summary: 'Four-bedroom executive layout with separate theatre space.',
+    perfectFor: ['growing-family', 'investor'],
+  },
+  {
+    id: 'design-randalls',
+    name: 'Randalls',
+    builder: 'Summit Homes',
+    price: 342000,
+    bedrooms: 4,
+    bathrooms: 2,
+    cars: 2,
+    houseWidth: 15,
+    summary: '15m frontage with games room and open living.',
+    perfectFor: ['growing-family', 'first-home'],
+  },
+  {
+    id: 'design-paulsens',
+    name: 'Paulsens',
+    builder: 'Plunkett Homes',
+    price: 305000,
+    bedrooms: 4,
+    bathrooms: 2,
+    cars: 2,
+    houseWidth: 12,
+    summary: '12m design with flexible fourth bedroom or study.',
+    perfectFor: ['first-home', 'investor'],
+  },
+  {
+    id: 'design-norseman',
+    name: 'Norseman',
+    builder: 'Summit Homes',
+    price: 358000,
+    bedrooms: 4,
+    bathrooms: 2,
+    cars: 2,
+    houseWidth: 15,
+    summary: '15m family home with master suite and rear activity zone.',
+    perfectFor: ['growing-family', 'investor'],
   },
 ]
 
@@ -63,6 +109,57 @@ export const demoPackageExtras: PackageExtra[] = [
   { id: 'extra-alfresco', name: 'Alfresco extension', price: 18500 },
   { id: 'extra-stone', name: 'Stone benchtops upgrade', price: 8200 },
   { id: 'extra-smart', name: 'Smart home package', price: 4500 },
+]
+
+export const demoCatalogTemplates: PackageTemplate[] = [
+  {
+    id: 'template-horizon-alkimos',
+    name: 'Horizon · Alkimos',
+    origin: 'catalog',
+    designId: 'design-horizon',
+    landId: 'land-alkimos',
+    includedExtras: [],
+  },
+  {
+    id: 'template-madison-baldivis',
+    name: 'Madison · Baldivis',
+    origin: 'catalog',
+    designId: 'design-madison',
+    landId: 'land-baldivis',
+    includedExtras: [],
+  },
+  {
+    id: 'template-randalls-alkimos',
+    name: 'Randalls · Alkimos',
+    origin: 'catalog',
+    designId: 'design-randalls',
+    landId: 'land-alkimos',
+    includedExtras: ['extra-stone'],
+  },
+  {
+    id: 'template-paulsens-byford',
+    name: 'Paulsens · Byford',
+    origin: 'catalog',
+    designId: 'design-paulsens',
+    landId: 'land-byford',
+    includedExtras: [],
+  },
+  {
+    id: 'template-norseman-baldivis',
+    name: 'Norseman · Baldivis',
+    origin: 'catalog',
+    designId: 'design-norseman',
+    landId: 'land-baldivis',
+    includedExtras: ['extra-alfresco'],
+  },
+  {
+    id: 'template-aria-byford',
+    name: 'Aria · Byford',
+    origin: 'catalog',
+    designId: 'design-aria',
+    landId: 'land-byford',
+    includedExtras: [],
+  },
 ]
 
 export const demoPackageConfigs: DealPackageConfig[] = [
@@ -75,6 +172,8 @@ export const demoPackageConfigs: DealPackageConfig[] = [
     buildPrice: 320000,
     extrasTotal: 8200,
     total: 578200,
+    templateId: 'template-horizon-alkimos',
+    customized: true,
   },
   {
     dealId: 'PHB-2026-00138',
@@ -85,6 +184,8 @@ export const demoPackageConfigs: DealPackageConfig[] = [
     buildPrice: 298000,
     extrasTotal: 0,
     total: 563000,
+    templateId: 'template-madison-baldivis',
+    customized: false,
   },
 ]
 
@@ -106,4 +207,8 @@ export function estimateRepayment (total: number): number {
     (loan * rate * Math.pow(1 + rate, months)) /
       (Math.pow(1 + rate, months) - 1)
   )
+}
+
+export function getCatalogTemplateById (id: string): PackageTemplate | undefined {
+  return demoCatalogTemplates.find((template) => template.id === id)
 }

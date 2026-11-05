@@ -1,10 +1,6 @@
-import { demoDeals, getPackageConfigForDeal } from '@/data/demo'
+import { demoDeals } from '@/data/demo'
 import type { DealStage } from '@/domain/deals/deal.types'
-import { formatCurrency } from '@/lib/formatting'
-import { PageHeader } from '@/components/layout/page-header'
-import { ButtonLink } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DealStageBadge } from '@/components/deals/deal-stage-badge'
+import { PackagesWorkspace } from '@/components/packages/packages-workspace'
 
 const PACKAGE_STAGES: DealStage[] = ['land', 'builder', 'package', 'drafting']
 
@@ -13,51 +9,5 @@ export default function PackagesPage () {
     PACKAGE_STAGES.includes(deal.stage)
   )
 
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Packages"
-        description="Configure land and builder packages for active deals."
-      />
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {activeDeals.map((deal) => {
-          const pkg = getPackageConfigForDeal(deal.id)
-
-          return (
-            <Card key={deal.id} className="border-border shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold">
-                  {deal.name}
-                </CardTitle>
-                <p className="font-mono text-xs text-text-tertiary">{deal.id}</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <DealStageBadge stage={deal.stage} />
-                {pkg ? (
-                  <p className="text-sm text-text-secondary">
-                    Package configured ·{' '}
-                    <span className="font-semibold text-text-primary">
-                      {formatCurrency(pkg.total)}
-                    </span>
-                  </p>
-                ) : (
-                  <p className="text-sm text-text-secondary">
-                    No package configured
-                  </p>
-                )}
-                <ButtonLink
-                  href={`/packages/builder?dealId=${deal.id}`}
-                  variant="brand"
-                  size="sm"
-                >
-                  {pkg ? 'Edit package' : 'Configure package'}
-                </ButtonLink>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-    </div>
-  )
+  return <PackagesWorkspace activeDeals={activeDeals} />
 }

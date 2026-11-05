@@ -1,13 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import type { Deal } from '@/domain/deals/deal.types'
 import type { DealPackageConfig } from '@/domain/packages/package.types'
 import { getClientById } from '@/data/demo'
 import {
+  buildDealPackageFromSelection,
+  buildDealPackageFromTemplate,
+} from '@/domain/packages/package-template-utils'
+import type { ResolvedPackageTemplate } from '@/domain/packages/package-template-utils'
+import {
   calculatePackageTotal,
-  demoHouseDesigns,
   demoLandLots,
   demoPackageExtras,
   estimateRepayment,
@@ -19,6 +23,9 @@ import {
   BuilderSelector,
 } from '@/components/packages/builder-selector'
 import { PackageSummaryPanel } from '@/components/packages/package-summary-panel'
+import { ChangeTemplateDialog } from '@/components/packages/change-template-dialog'
+import { SaveAsTemplateDialog } from '@/components/packages/save-as-template-dialog'
+import { usePackageWorkspace } from '@/components/packages/use-package-workspace'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,60 +36,118 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-
-const BUILDERS = [...new Set(demoHouseDesigns.map((design) => design.builder))]
 
 interface PackageBuilderProps {
   deal: Deal
   initialConfig?: DealPackageConfig
 }
 
+function packageBuilderStateKey (
+  dealId: string,
+  config?: DealPackageConfig
+): string {
+  if (!config) return `${dealId}-empty`
+  return [
+    dealId,
+    config.landId,
+    config.designId,
+    config.selectedExtras.join(','),
+    config.templateId ?? '',
+  ].join(':')
+}
+
+function subscribeNoop () {
+  return () => {}
+}
+
 export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
+  const { getDealPackage } = usePackageWorkspace()
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false)
+
+  if (!mounted) {
+    return (
+      <p className="text-sm text-text-secondary">Loading package builder…</p>
+    )
+  }
+
+  const savedConfig = getDealPackage(deal.id) ?? initialConfig
+
+  return (
+    <PackageBuilderEditor
+      key={packageBuilderStateKey(deal.id, savedConfig)}
+      deal={deal}
+      savedConfig={savedConfig}
+    />
+  )
+}
+
+interface PackageBuilderEditorProps {
+  deal: Deal
+  savedConfig?: DealPackageConfig
+}
+
+function PackageBuilderEditor ({
+  deal,
+  savedConfig,
+}: PackageBuilderEditorProps) {
+  const {
+    houseDesigns,
+    saveDealPackage,
+    getTemplate,
+  } = usePackageWorkspace()
+
   const [selectedLandId, setSelectedLandId] = useState(
-    initialConfig?.landId ?? demoLandLots[0].id
+    () => savedConfig?.landId ?? demoLandLots[0].id
   )
   const [selectedDesignId, setSelectedDesignId] = useState(
-    initialConfig?.designId ?? demoHouseDesigns[0].id
+    () => savedConfig?.designId ?? houseDesigns[0]?.id ?? ''
   )
   const [selectedExtras, setSelectedExtras] = useState<string[]>(
-    initialConfig?.selectedExtras ?? []
+    () => savedConfig?.selectedExtras ?? []
+  )
+  const [templateId, setTemplateId] = useState<string | undefined>(
+    () => savedConfig?.templateId
   )
   const [savedDialogOpen, setSavedDialogOpen] = useState(false)
   const [presentDialogOpen, setPresentDialogOpen] = useState(false)
+  const [changeTemplateOpen, setChangeTemplateOpen] = useState(false)
+  const [saveTemplateOpen, setSaveTemplateOpen] = useState(false)
 
-  const selectedLand = demoLandLots.find((lot) => lot.id === selectedLandId)!
-  const selectedDesign = demoHouseDesigns.find(
-    (design) => design.id === selectedDesignId
-  )!
-  const selectedBuilder = selectedDesign.builder
-  const visibleDesigns = demoHouseDesigns.filter(
+  const selectedLand =
+    demoLandLots.find((lot) => lot.id === selectedLandId) ?? demoLandLots[0]
+  const selectedDesign =
+    houseDesigns.find((design) => design.id === selectedDesignId) ??
+    houseDesigns[0]
+
+  const BUILDERS = useMemo(
+    () => [...new Set(houseDesigns.map((design) => design.builder))],
+    [houseDesigns]
+  )
+
+  const selectedBuilder = selectedDesign?.builder ?? BUILDERS[0] ?? ''
+  const visibleDesigns = houseDesigns.filter(
     (design) => design.builder === selectedBuilder
   )
+
   const activeExtras = demoPackageExtras.filter((extra) =>
     selectedExtras.includes(extra.id)
   )
   const extrasTotal = activeExtras.reduce((sum, extra) => sum + extra.price, 0)
   const total = calculatePackageTotal(
     selectedLand.price,
-    selectedDesign.price,
+    selectedDesign?.price ?? 0,
     activeExtras
   )
   const repayment = estimateRepayment(total)
   const client = getClientById(deal.clientId)
+  const activeTemplate = templateId ? getTemplate(templateId) : undefined
 
   function selectBuilder (builder: string) {
-    if (selectedBuilder === builder) {
-      return
-    }
-
-    const nextDesign = demoHouseDesigns.find(
-      (design) => design.builder === builder
-    )
-
-    if (nextDesign) {
-      setSelectedDesignId(nextDesign.id)
-    }
+    if (selectedBuilder === builder) return
+    const nextDesign = houseDesigns.find((design) => design.builder === builder)
+    if (nextDesign) setSelectedDesignId(nextDesign.id)
   }
 
   function toggleExtra (extraId: string) {
@@ -90,6 +155,40 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
       current.includes(extraId)
         ? current.filter((id) => id !== extraId)
         : [...current, extraId]
+    )
+  }
+
+  function applyTemplate (template: ResolvedPackageTemplate) {
+    const config = buildDealPackageFromTemplate(
+      deal.id,
+      template,
+      demoPackageExtras
+    )
+    setSelectedLandId(config.landId)
+    setSelectedDesignId(config.designId)
+    setSelectedExtras(config.selectedExtras)
+    setTemplateId(config.templateId)
+  }
+
+  function handleSave () {
+    if (!selectedDesign) return
+    const config = buildDealPackageFromSelection(
+      deal.id,
+      selectedLand,
+      selectedDesign,
+      selectedExtras,
+      demoPackageExtras,
+      templateId
+    )
+    saveDealPackage(config)
+    setSavedDialogOpen(true)
+  }
+
+  if (!selectedDesign) {
+    return (
+      <p className="text-sm text-text-secondary">
+        No house designs available. Add a custom template first.
+      </p>
     )
   }
 
@@ -115,6 +214,44 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
           {deal.name} · {deal.id}
         </p>
       </div>
+
+      <Card className="border-border shadow-none">
+        <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">
+              Starting template
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-text-primary">
+                {activeTemplate?.name ?? 'No template selected'}
+              </p>
+              {activeTemplate ? (
+                <Badge variant="outline" className="capitalize">
+                  {activeTemplate.origin}
+                </Badge>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setChangeTemplateOpen(true)}
+            >
+              Change template
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setSaveTemplateOpen(true)}
+            >
+              Save as template
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20.5rem] xl:grid-cols-[minmax(0,1fr)_22.5rem]">
         <div className="space-y-5">
@@ -208,11 +345,25 @@ export function PackageBuilder ({ deal, initialConfig }: PackageBuilderProps) {
             total={total}
             monthlyRepayment={repayment}
             budget={client?.budget}
-            onSave={() => setSavedDialogOpen(true)}
+            onSave={handleSave}
             onPresent={() => setPresentDialogOpen(true)}
           />
         </aside>
       </div>
+
+      <ChangeTemplateDialog
+        open={changeTemplateOpen}
+        onOpenChange={setChangeTemplateOpen}
+        onSelect={applyTemplate}
+      />
+
+      <SaveAsTemplateDialog
+        open={saveTemplateOpen}
+        onOpenChange={setSaveTemplateOpen}
+        landId={selectedLandId}
+        designId={selectedDesignId}
+        selectedExtras={selectedExtras}
+      />
 
       <Dialog open={savedDialogOpen} onOpenChange={setSavedDialogOpen}>
         <DialogContent>

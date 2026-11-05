@@ -2,8 +2,8 @@ import Link from 'next/link'
 import type { Client } from '@/domain/clients/client.types'
 import type { Deal } from '@/domain/deals/deal.types'
 import type { Document } from '@/domain/documents/document.types'
-import type { DealPackageConfig } from '@/domain/packages/package.types'
 import { formatCurrency } from '@/lib/formatting'
+import { DealPackageConfiguredBadge } from '@/components/deals/deal-package-configured-badge'
 import { DEAL_STAGE_LABELS } from '@/lib/constants'
 import { DealStageBadge } from '@/components/deals/deal-stage-badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -15,14 +15,12 @@ interface DealWorkspaceHeaderProps {
   deal: Deal
   client?: Client
   documents: Document[]
-  packageConfig?: DealPackageConfig
 }
 
 export function DealWorkspaceHeader ({
   deal,
   client,
   documents,
-  packageConfig,
 }: DealWorkspaceHeaderProps) {
   const requiredDocs = documents.filter((doc) => doc.required)
   const verifiedCount = requiredDocs.filter(
@@ -76,14 +74,7 @@ export function DealWorkspaceHeader ({
                 {verifiedCount} of {requiredDocs.length} documents verified
               </Badge>
             ) : null}
-            {!packageConfig ? (
-              <Badge
-                variant="secondary"
-                className="bg-warning/10 text-warning"
-              >
-                Package not saved
-              </Badge>
-            ) : null}
+            <DealPackageConfiguredBadge dealId={deal.id} />
           </div>
         </div>
 

@@ -6,7 +6,6 @@ import {
   getDocumentsByDealId,
   getActivitiesByDealId,
   getTasksByDealId,
-  getPackageConfigForDeal,
 } from '@/data/demo'
 import { DealWorkspace } from '@/components/deals/deal-workspace'
 
@@ -24,7 +23,6 @@ export default async function DealDetailPage ({
   const documents = getDocumentsByDealId(deal.id)
   const activities = getActivitiesByDealId(deal.id)
   const tasks = getTasksByDealId(deal.id)
-  const packageConfig = getPackageConfigForDeal(deal.id)
   const commission = getCommissionByDealId(deal.id)
 
   return (
@@ -34,7 +32,6 @@ export default async function DealDetailPage ({
       documents={documents}
       activities={activities}
       tasks={tasks}
-      packageConfig={packageConfig}
       commission={commission}
     />
   )

@@ -1,15 +1,20 @@
-import type { DealPackageConfig } from '@/domain/packages/package.types'
+'use client'
+
 import {
   demoHouseDesigns,
   demoLandLots,
 } from '@/data/demo/packages'
 import { formatCurrency } from '@/lib/formatting'
 import { ButtonLink } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  getMergedHouseDesigns,
+  usePackageWorkspace,
+} from '@/components/packages/use-package-workspace'
 
 interface DealPackageSummaryProps {
   dealId: string
-  packageConfig?: DealPackageConfig
 }
 
 function PackageRow ({
@@ -37,11 +42,12 @@ function PackageRow ({
   )
 }
 
-export function DealPackageSummary ({
-  dealId,
-  packageConfig,
-}: DealPackageSummaryProps) {
+export function DealPackageSummary ({ dealId }: DealPackageSummaryProps) {
+  const { getDealPackage, getTemplate, state } = usePackageWorkspace()
+  const packageConfig = getDealPackage(dealId)
   const builderHref = `/packages/builder?dealId=${dealId}`
+
+  const designs = getMergedHouseDesigns(state)
 
   if (!packageConfig) {
     return (
@@ -69,9 +75,12 @@ export function DealPackageSummary ({
   }
 
   const land = demoLandLots.find((lot) => lot.id === packageConfig.landId)
-  const design = demoHouseDesigns.find(
-    (item) => item.id === packageConfig.designId
-  )
+  const design =
+    designs.find((item) => item.id === packageConfig.designId) ??
+    demoHouseDesigns.find((item) => item.id === packageConfig.designId)
+  const template = packageConfig.templateId
+    ? getTemplate(packageConfig.templateId)
+    : undefined
 
   return (
     <Card className="border-border shadow-none">
@@ -89,6 +98,21 @@ export function DealPackageSummary ({
         </CardAction>
       </CardHeader>
       <CardContent>
+        {template ? (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <p className="text-sm text-text-secondary">
+              Template:{' '}
+              <span className="font-medium text-text-primary">
+                {template.name}
+              </span>
+            </p>
+            {packageConfig.customized ? (
+              <Badge variant="outline" className="text-warning">
+                Customized
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
         <dl>
           {land ? (
             <PackageRow

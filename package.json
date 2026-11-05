@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:contracts": "tsx --test src/domain/documents/contract-progress.test.ts"
+    "test:contracts": "tsx --test src/domain/documents/contract-progress.test.ts",
+    "test:packages": "tsx --test src/domain/packages/*.test.ts src/components/packages/*.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

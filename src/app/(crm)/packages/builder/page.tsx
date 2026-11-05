@@ -17,7 +17,5 @@ export default async function PackageBuilderPage ({
 
   const initialConfig = getPackageConfigForDeal(deal.id)
 
-  return (
-    <PackageBuilder deal={deal} initialConfig={initialConfig} />
-  )
+  return <PackageBuilder deal={deal} initialConfig={initialConfig} />
 }
