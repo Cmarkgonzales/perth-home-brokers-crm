@@ -2,7 +2,6 @@ import type { DashboardPipelineGroupId } from '@/domain/deals/pipeline-groups'
 
 export type AttentionSeverity = 'high' | 'medium' | 'low'
 export type AttentionAction = 'Review' | 'Open'
-export type MetricHintTone = 'positive' | 'warning' | 'neutral'
 
 export interface AttentionItem {
   id: string
@@ -21,18 +20,6 @@ export interface DashboardPipelineColumn {
   href: string
 }
 
-export interface DashboardMetric {
-  id: 'active-deals' | 'new-leads' | 'action-required' | 'pipeline-value'
-  label: string
-  value: string
-  hint: string
-  hintPeriod?: string
-  hintTone: MetricHintTone
-  href: string
-  trend: number[]
-  highlighted?: boolean
-}
-
 export interface DashboardBriefing {
   headline: string
   overdueApprovals: number
@@ -41,12 +28,92 @@ export interface DashboardBriefing {
   prompt: string
 }
 
-export interface DashboardSnapshot {
+export type DashboardMoneyMetricId =
+  | 'settlements-due'
+  | 'expected-commission'
+  | 'active-pipeline'
+  | 'blocked'
+
+export interface DashboardMoneyMetric {
+  id: DashboardMoneyMetricId
+  label: string
+  primaryValue: string
+  secondaryValue?: string
+  hint?: string
+  href: string
+  warning?: boolean
+}
+
+export type StalledDealSeverity = 'Urgent' | 'High'
+
+export interface StalledDealRow {
+  dealId: string
+  reference: string
+  dealName: string
+  stageLabel: string
+  owner: string
+  dueLabel: string
+  blocker: string
+  severity: StalledDealSeverity
+  href: string
+}
+
+export interface DashboardEnquiryRow {
+  leadId: string
+  name: string
+  line: string
+  href: string
+}
+
+export interface ComingUpItem {
+  dealId: string
+  title: string
+  valueLabel: string
+  dueLabel: string
+  packageLine?: string
+  href: string
+}
+
+export interface BookHealthCounts {
+  activeDeals: number
+  inFinance: number
+  inPackage: number
+  inBuild: number
+}
+
+export interface DonutSlice {
+  id: string
+  label: string
+  count: number
+  /** CSS color for donut segment */
+  color: string
+}
+
+export interface BrokerWorkloadRow {
+  owner: string
+  openFiles: number
+  nextDueLabel: string
+}
+
+export interface DashboardBookHealth {
+  counts: BookHealthCounts
+  pastFinancePercent: number
+  pastFinanceLabel: string
+  donutSlices: DonutSlice[]
+  donutTotal: number
+  delayedCount: number
+  monthlySettlements: { month: string; count: number }[]
+}
+
+export interface DashboardOperationsSnapshot {
+  periodLabel: string
   greetingName: string
-  metrics: DashboardMetric[]
-  pipeline: DashboardPipelineColumn[]
-  pipelineDealCount: number
+  money: DashboardMoneyMetric[]
+  stalledDeals: StalledDealRow[]
+  enquiries: DashboardEnquiryRow[]
+  newEnquiriesTotal: number
+  comingUp: ComingUpItem[]
+  book: DashboardBookHealth
+  brokers: BrokerWorkloadRow[]
   briefing: DashboardBriefing
-  attentionItems: AttentionItem[]
-  urgentCount: number
 }
